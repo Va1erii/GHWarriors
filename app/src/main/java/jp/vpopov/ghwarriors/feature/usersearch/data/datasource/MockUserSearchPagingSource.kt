@@ -1,0 +1,45 @@
+package jp.vpopov.ghwarriors.feature.usersearch.data.datasource
+
+import android.util.Log
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import jp.vpopov.ghwarriors.feature.usersearch.data.dto.SearchUserDTO
+import jp.vpopov.ghwarriors.feature.usersearch.data.dto.UserSearchResponseDTO
+import kotlinx.coroutines.CancellationException
+
+class MockUserSearchPagingSource : PagingSource<Int, SearchUserDTO>() {
+    override fun getRefreshKey(state: PagingState<Int, SearchUserDTO>): Int? {
+        return state.anchorPosition?.let { anchorPosition ->
+            val anchorPage = state.closestPageToPosition(anchorPosition)
+            anchorPage?.prevKey?.plus(1) ?: anchorPage?.nextKey?.minus(1)
+        }
+    }
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchUserDTO> {
+        return try {
+            val page = params.key ?: 1
+            val response = UserSearchResponseDTO(
+                items = List(30) { index ->
+                    SearchUserDTO(
+                        id = (page - 1) * 30 + index + 1,
+                        login = "user${(page - 1) * 30 + index + 1}",
+                        avatarUrl = "https://avatars.githubusercontent.com/u/30325285?v=4"
+                    )
+                }
+            )
+            val users = response.items
+            val nextKey = if (users.isEmpty()) null else page + 1
+            val prevKey = if (page == 1) null else page - 1
+            LoadResult.Page(
+                data = users,
+                prevKey = prevKey,
+                nextKey = nextKey
+            )
+        } catch (exception: CancellationException) {
+            throw exception
+        } catch (exception: Exception) {
+            Log.e("SearchPagingSource", "Error loading data", exception)
+            LoadResult.Error(exception)
+        }
+    }
+}

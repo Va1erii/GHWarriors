@@ -15,6 +15,7 @@ okhttpLoggingVersion = "5.1.0"
 kotlinxSerializationJsonVersion = "1.9.0"
 pagingVersion = "3.3.6"
 coilVersion = "3.3.0"
+timberVersion = "5.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,8 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "pagingVersion" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingVersion" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilVersion" }
+coil-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilVersion" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
