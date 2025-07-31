@@ -1,13 +1,21 @@
-package jp.vpopov.ghwarriors.feature.usersearch.data.datasource
+package jp.vpopov.ghwarriors.feature.search.data.datasource
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import jp.vpopov.ghwarriors.feature.usersearch.data.dto.SearchUserDTO
-import jp.vpopov.ghwarriors.feature.usersearch.data.dto.UserSearchResponseDTO
+import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.feature.search.data.SearchApi
+import jp.vpopov.ghwarriors.feature.search.data.dto.SearchUserDTO
 import kotlinx.coroutines.CancellationException
 
-class MockUserSearchPagingSource : PagingSource<Int, SearchUserDTO>() {
+class SearchPagingSource(
+    private val searchApi: SearchApi,
+    private val query: String
+) : PagingSource<Int, SearchUserDTO>() {
+    companion object {
+        private const val STARTING_PAGE = 1
+        const val PER_PAGE = 30
+    }
+
     override fun getRefreshKey(state: PagingState<Int, SearchUserDTO>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
@@ -17,19 +25,15 @@ class MockUserSearchPagingSource : PagingSource<Int, SearchUserDTO>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchUserDTO> {
         return try {
-            val page = params.key ?: 1
-            val response = UserSearchResponseDTO(
-                items = List(30) { index ->
-                    SearchUserDTO(
-                        id = (page - 1) * 30 + index + 1,
-                        login = "user${(page - 1) * 30 + index + 1}",
-                        avatarUrl = "https://avatars.githubusercontent.com/u/30325285?v=4"
-                    )
-                }
+            val page = params.key ?: STARTING_PAGE
+            val response = searchApi.searchUsers(
+                query = query,
+                page = page,
+                perPage = PER_PAGE
             )
             val users = response.items
             val nextKey = if (users.isEmpty()) null else page + 1
-            val prevKey = if (page == 1) null else page - 1
+            val prevKey = if (page == STARTING_PAGE) null else page - 1
             LoadResult.Page(
                 data = users,
                 prevKey = prevKey,
@@ -38,7 +42,7 @@ class MockUserSearchPagingSource : PagingSource<Int, SearchUserDTO>() {
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            Log.e("SearchPagingSource", "Error loading data", exception)
+            Logging.e(exception) { "Error loading data" }
             LoadResult.Error(exception)
         }
     }

@@ -16,6 +16,7 @@ kotlinxSerializationJsonVersion = "1.9.0"
 pagingVersion = "3.3.6"
 coilVersion = "3.3.0"
 timberVersion = "5.0.1"
+decomposeVersion = "3.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +45,8 @@ androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", 
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilVersion" }
 coil-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilVersion" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timberVersion" }
+decompose = { group = "com.arkivanov.decompose", name = "decompose", version.ref = "decomposeVersion" }
+decompose-compose = { group = "com.arkivanov.decompose", name = "extensions-compose", version.ref = "decomposeVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

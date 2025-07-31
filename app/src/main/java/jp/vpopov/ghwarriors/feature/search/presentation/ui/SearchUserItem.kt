@@ -1,48 +1,54 @@
-package jp.vpopov.ghwarriors.feature.usersearch.ui
+package jp.vpopov.ghwarriors.feature.search.presentation.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.domain.model.User
 
 @Composable
 fun SearchUserItem(
     user: User,
-    modifier: Modifier = Modifier,
-    onItemClick: () -> Unit = {}
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = onItemClick,
-        modifier = modifier,
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        )
     ) {
         Row(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            // User Avatar
             val context = LocalContext.current
             val request = remember(user.avatarUrl) {
                 ImageRequest.Builder(context)
@@ -56,45 +62,17 @@ fun SearchUserItem(
                 contentScale = ContentScale.Crop,
                 error = ColorPainter(Color.LightGray),
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
             )
-            Spacer(Modifier.size(8.dp))
+
+            Spacer(modifier = Modifier.width(16.dp))
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = user.userName,
                     style = MaterialTheme.typography.titleMedium
                 )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SearchUserItemPreview() {
-    GHWarriorsTheme {
-        LazyColumn(
-            Modifier
-                .fillMaxWidth()
-                .background(Color.Cyan)
-                .padding(24.dp)
-        ) {
-            items(
-                count = 3,
-                key = { it }
-            ) {
-                SearchUserItem(
-                    user = User(
-                        id = it,
-                        userName = "John_Snow_$it",
-                        avatarUrl = "https://example.com/avatar.jpg",
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 60.dp)
-                )
-                Spacer(Modifier.height(4.dp))
             }
         }
     }

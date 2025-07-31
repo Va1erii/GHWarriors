@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.decompose)
+    implementation(libs.decompose.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.ksp)
     testImplementation(libs.junit)

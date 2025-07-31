@@ -1,21 +1,13 @@
-package jp.vpopov.ghwarriors.feature.usersearch.data.datasource
+package jp.vpopov.ghwarriors.feature.search.data.datasource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import jp.vpopov.ghwarriors.core.logging.Logging
-import jp.vpopov.ghwarriors.feature.usersearch.data.UserSearchApi
-import jp.vpopov.ghwarriors.feature.usersearch.data.dto.SearchUserDTO
+import jp.vpopov.ghwarriors.feature.search.data.dto.SearchUserDTO
+import jp.vpopov.ghwarriors.feature.search.data.dto.SearchResponseDTO
 import kotlinx.coroutines.CancellationException
 
-class UserSearchPagingSource(
-    private val userSearchApi: UserSearchApi,
-    private val query: String
-) : PagingSource<Int, SearchUserDTO>() {
-    companion object {
-        private const val STARTING_PAGE = 1
-        const val PER_PAGE = 30
-    }
-
+class MockSearchPagingSource : PagingSource<Int, SearchUserDTO>() {
     override fun getRefreshKey(state: PagingState<Int, SearchUserDTO>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
@@ -25,15 +17,19 @@ class UserSearchPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchUserDTO> {
         return try {
-            val page = params.key ?: STARTING_PAGE
-            val response = userSearchApi.searchUsers(
-                query = query,
-                page = page,
-                perPage = PER_PAGE
+            val page = params.key ?: 1
+            val response = SearchResponseDTO(
+                items = List(30) { index ->
+                    SearchUserDTO(
+                        id = (page - 1) * 30 + index + 1,
+                        login = "user${(page - 1) * 30 + index + 1}",
+                        avatarUrl = "https://avatars.githubusercontent.com/u/30325285?v=4"
+                    )
+                }
             )
             val users = response.items
             val nextKey = if (users.isEmpty()) null else page + 1
-            val prevKey = if (page == STARTING_PAGE) null else page - 1
+            val prevKey = if (page == 1) null else page - 1
             LoadResult.Page(
                 data = users,
                 prevKey = prevKey,

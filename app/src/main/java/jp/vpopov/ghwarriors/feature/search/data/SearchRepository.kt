@@ -1,13 +1,14 @@
-package jp.vpopov.ghwarriors.feature.usersearch.data
+package jp.vpopov.ghwarriors.feature.search.data
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import jp.vpopov.ghwarriors.core.domain.model.User
-import jp.vpopov.ghwarriors.feature.usersearch.data.datasource.MockUserSearchPagingSource
-import jp.vpopov.ghwarriors.feature.usersearch.data.datasource.UserSearchPagingSource
-import jp.vpopov.ghwarriors.feature.usersearch.data.dto.asDomainModel
+import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.feature.search.data.datasource.MockSearchPagingSource
+import jp.vpopov.ghwarriors.feature.search.data.datasource.SearchPagingSource
+import jp.vpopov.ghwarriors.feature.search.data.dto.asDomainModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -19,18 +20,19 @@ interface SearchRepository {
 }
 
 class SearchRepositoryImpl @Inject constructor(
-    private val userSearchApi: UserSearchApi
+    private val searchApi: SearchApi,
 ) : SearchRepository {
     override suspend fun searchUsers(query: String): Flow<PagingData<User>> {
+        Logging.d { "Search users, query=($query)" }
         return Pager(
             config = PagingConfig(
-                pageSize = UserSearchPagingSource.PER_PAGE,
+                pageSize = SearchPagingSource.PER_PAGE,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                MockUserSearchPagingSource()
-//                SearchPagingSource(
-//                    searchApi = searchApi,
+                MockSearchPagingSource()
+//                UserSearchPagingSource(
+//                    userSearchApi = userSearchApi,
 //                    query = query
 //                )
             }

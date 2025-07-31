@@ -3,12 +3,13 @@ package jp.vpopov.ghwarriors.core.logging
 import android.util.Log
 import jp.vpopov.ghwarriors.BuildConfig
 import timber.log.Timber
+import javax.inject.Inject
 
 interface LoggingManager {
     fun setup()
 }
 
-class TimberLoggingManager : LoggingManager {
+class TimberLoggingManager @Inject constructor() : LoggingManager {
     val logger = object : Logger {
         override fun log(
             priority: Int,

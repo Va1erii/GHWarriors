@@ -15,10 +15,10 @@ class GHWarriorsApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val imageLoader = ImageLoader.Builder(this)
-            .logger(DebugLogger())
-            .build()
-        SingletonImageLoader.setSafe { imageLoader }
+//        val imageLoader = ImageLoader.Builder(this)
+//            .logger(DebugLogger())
+//            .build()
+//        SingletonImageLoader.setSafe { imageLoader }
         loggingManager.setup()
     }
 }
