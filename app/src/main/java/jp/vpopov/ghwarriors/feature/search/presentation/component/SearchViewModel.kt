@@ -8,7 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
-import jp.vpopov.ghwarriors.core.domain.model.User
+import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.feature.search.data.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 data class SearchState(
     val query: String = "",
-    val users: PagingData<User> = PagingData.empty(
+    val users: PagingData<UserInfo> = PagingData.empty(
         sourceLoadStates = LoadStates(
             refresh = NotLoading(false),
             prepend = NotLoading(false),
@@ -35,15 +35,20 @@ class SearchViewModel @AssistedInject constructor(
     val state: StateFlow<SearchState> = _state.asStateFlow()
 
     fun search(query: String) {
+        if (_state.value.query == query) return
         when {
             query.isBlank() -> {
-                _state.update { it.copy(query = query, users = PagingData.empty(
-                    sourceLoadStates = LoadStates(
-                        refresh = NotLoading(false),
-                        prepend = NotLoading(false),
-                        append = NotLoading(false)
+                _state.update {
+                    it.copy(
+                        query = query, users = PagingData.empty(
+                            sourceLoadStates = LoadStates(
+                                refresh = NotLoading(false),
+                                prepend = NotLoading(false),
+                                append = NotLoading(false)
+                            )
+                        )
                     )
-                )) }
+                }
             }
 
             else -> {

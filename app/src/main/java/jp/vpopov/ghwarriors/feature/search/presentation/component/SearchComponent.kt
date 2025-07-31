@@ -2,7 +2,7 @@ package jp.vpopov.ghwarriors.feature.search.presentation.component
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.getOrCreate
-import jp.vpopov.ghwarriors.core.domain.model.User
+import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.builtins.serializer
 import javax.inject.Inject
@@ -11,12 +11,12 @@ interface SearchComponent {
     val model: StateFlow<SearchState>
 
     fun search(query: String)
-    fun onUserSelected(user: User)
+    fun onUserSelected(user: UserInfo)
 
     interface Factory {
         fun create(
             componentContext: ComponentContext,
-            userSelected: (User) -> Unit
+            userSelected: (UserInfo) -> Unit
         ): SearchComponent
     }
 }
@@ -26,7 +26,7 @@ class DefaultSearchComponentFactory @Inject constructor(
 ) : SearchComponent.Factory {
     override fun create(
         componentContext: ComponentContext,
-        userSelected: (User) -> Unit
+        userSelected: (UserInfo) -> Unit
     ): SearchComponent = DefaultSearchComponent(
         componentContext = componentContext,
         userSelected = userSelected,
@@ -36,7 +36,7 @@ class DefaultSearchComponentFactory @Inject constructor(
 
 class DefaultSearchComponent(
     componentContext: ComponentContext,
-    private val userSelected: (User) -> Unit,
+    private val userSelected: (UserInfo) -> Unit,
     private val viewModelFactory: SearchViewModel.Factory
 ) : SearchComponent, ComponentContext by componentContext {
     private val viewModel: SearchViewModel = instanceKeeper.getOrCreate {
@@ -53,7 +53,7 @@ class DefaultSearchComponent(
         viewModel.search(query)
     }
 
-    override fun onUserSelected(user: User) = userSelected(user)
+    override fun onUserSelected(user: UserInfo) = userSelected(user)
 
     private companion object {
         const val STATE_KEY = "search_state"

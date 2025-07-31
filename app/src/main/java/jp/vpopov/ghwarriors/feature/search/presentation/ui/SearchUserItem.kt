@@ -25,11 +25,11 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import jp.vpopov.ghwarriors.core.domain.model.User
+import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 
 @Composable
 fun SearchUserItem(
-    user: User,
+    user: UserInfo,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

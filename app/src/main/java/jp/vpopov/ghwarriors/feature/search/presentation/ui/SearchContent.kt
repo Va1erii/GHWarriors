@@ -21,7 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import jp.vpopov.ghwarriors.core.domain.model.User
+import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.core.logging.Logging
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
 import kotlinx.coroutines.delay
@@ -90,8 +89,8 @@ fun SearchContent(
 @Composable
 private fun SearchContentSection(
     query: String,
-    data: LazyPagingItems<User>,
-    onUserClick: (User) -> Unit,
+    data: LazyPagingItems<UserInfo>,
+    onUserClick: (UserInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(data) {
@@ -160,8 +159,8 @@ private fun EmptyQueryContent(
 @Composable
 private fun PagingSearchResultsList(
     query: String,
-    data: LazyPagingItems<User>,
-    onUserClick: (User) -> Unit,
+    data: LazyPagingItems<UserInfo>,
+    onUserClick: (UserInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(

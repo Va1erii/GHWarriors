@@ -1,6 +1,6 @@
 package jp.vpopov.ghwarriors.feature.search.data.dto
 
-import jp.vpopov.ghwarriors.core.domain.model.User
+import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,8 +16,8 @@ data class SearchUserDTO(
     @SerialName("avatar_url") val avatarUrl: String,
 )
 
-fun SearchUserDTO.asDomainModel(): User {
-    return User(
+fun SearchUserDTO.asDomainModel(): UserInfo {
+    return UserInfo(
         id = id,
         userName = login,
         avatarUrl = avatarUrl
