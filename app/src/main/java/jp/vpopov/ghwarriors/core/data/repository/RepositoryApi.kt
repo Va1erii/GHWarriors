@@ -5,8 +5,8 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface RepositoryApi {
-    @GET("user/{user_name}/repos")
+    @GET("user/{userId}/repos")
     suspend fun fetchUserRepositories(
-        @Path("user_name") userName: String
+        @Path("userId") userId: Int
     ): List<UserRepositoryDTO>
 }

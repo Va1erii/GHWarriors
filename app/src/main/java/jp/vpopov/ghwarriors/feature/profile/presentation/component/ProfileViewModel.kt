@@ -45,7 +45,7 @@ class ProfileViewModel @AssistedInject constructor(
                 }
         }
         viewModelScope.launch {
-            userRepository.fetchPublicRepositories(userId.toString())
+            userRepository.fetchPublicRepositories(userId)
                 .onSuccess { repositories ->
                     _state.update { it.copy(repositories = repositories) }
                 }
