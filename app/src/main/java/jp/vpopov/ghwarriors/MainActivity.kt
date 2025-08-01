@@ -5,6 +5,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.defaultComponentContext
 import dagger.hilt.android.AndroidEntryPoint
 import jp.vpopov.ghwarriors.app.search.SearchRootComponent
@@ -33,7 +41,15 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             GHWarriorsTheme {
-                SearchRootContent(component)
+                Scaffold { innerPadding ->
+                    SearchRootContent(
+                        component = component,
+                        modifier = Modifier
+                            .background(Color.Cyan)
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                    )
+                }
             }
         }
     }

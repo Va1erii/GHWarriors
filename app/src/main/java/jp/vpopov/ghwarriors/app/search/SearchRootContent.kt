@@ -10,11 +10,11 @@ import jp.vpopov.ghwarriors.feature.search.presentation.ui.SearchContent
 
 @Composable
 fun SearchRootContent(
-    searchRootComponent: SearchRootComponent,
+    component: SearchRootComponent,
     modifier: Modifier = Modifier
 ) {
     Children(
-        searchRootComponent.childStack,
+        component.childStack,
         modifier = modifier
     ) {
         when (val child = it.instance) {
