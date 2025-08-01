@@ -4,4 +4,8 @@
     <string name="search">Search</string>
     <string name="search_hint">Search users…</string>
     <string name="search_clear">Clear search</string>
+    <string name="user_avatar">Avatar</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="repositories">Repositories</string>
 </resources>

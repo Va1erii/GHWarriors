@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
                         component = component,
                         modifier = Modifier
                             .background(Color.Cyan)
+                            .consumeWindowInsets(innerPadding)
                             .padding(innerPadding)
                             .fillMaxSize()
                     )

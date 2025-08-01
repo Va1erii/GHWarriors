@@ -16,7 +16,7 @@ class TimberLoggingManager @Inject constructor() : LoggingManager {
             throwable: Throwable?,
             message: () -> String
         ) {
-            Timber.log(priority, message(), throwable)
+            Timber.log(priority = priority, message = message(), t = throwable)
         }
     }
 
