@@ -6,7 +6,6 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.core.logging.Logging
-import jp.vpopov.ghwarriors.feature.search.data.datasource.MockSearchPagingSource
 import jp.vpopov.ghwarriors.feature.search.data.datasource.SearchPagingSource
 import jp.vpopov.ghwarriors.feature.search.data.dto.asDomainModel
 import kotlinx.coroutines.flow.Flow
@@ -30,11 +29,11 @@ class SearchRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                MockSearchPagingSource()
-//                UserSearchPagingSource(
-//                    userSearchApi = userSearchApi,
-//                    query = query
-//                )
+//                MockSearchPagingSource()
+                SearchPagingSource(
+                    searchApi = searchApi,
+                    query = query
+                )
             }
         )
             .flow
