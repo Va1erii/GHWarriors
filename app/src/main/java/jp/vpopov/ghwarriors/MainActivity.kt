@@ -16,13 +16,16 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var rootComponentFactory: RootComponent.Factory
+    private var component: RootComponent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val deeplinkUrl = intent.dataString
         val component = rootComponentFactory.create(
             componentContext = defaultComponentContext(),
-        )
+            deeplinkUrl = deeplinkUrl
+        ).also { this.component = it }
         setContent {
             GHWarriorsTheme {
                 RootScreen(component)
@@ -32,5 +35,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        val deeplinkUrl = intent.dataString ?: return
+        component?.handleDeeplink(deeplinkUrl)
     }
 }

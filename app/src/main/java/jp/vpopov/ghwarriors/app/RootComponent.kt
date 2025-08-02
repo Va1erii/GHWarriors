@@ -1,6 +1,5 @@
 package jp.vpopov.ghwarriors.app
 
-import com.arkivanov.decompose.Child
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -11,9 +10,11 @@ import jakarta.inject.Inject
 import jp.vpopov.ghwarriors.app.bookmark.BookmarkRootComponent
 import jp.vpopov.ghwarriors.app.search.SearchRootComponent
 import jp.vpopov.ghwarriors.app.settings.SettingsRootComponent
+import jp.vpopov.ghwarriors.core.deeplink.DeeplinkHandler
+import jp.vpopov.ghwarriors.core.deeplink.DeeplinkValidator
 import kotlinx.serialization.Serializable
 
-interface RootComponent {
+interface RootComponent : DeeplinkHandler {
     val stack: Value<ChildStack<*, Child>>
 
     fun selectTab(tab: Tab)
@@ -123,7 +124,8 @@ class DefaultRootComponent(
     }
 
     private fun getInitialConfig(deeplinkUrl: String?): Config {
-        return Config.Search()
+        return deeplinkUrl?.let { createConfigFromDeeplink(it) }
+            ?: Config.Search()
     }
 
     override fun selectTab(tab: RootComponent.Tab) {
@@ -133,6 +135,21 @@ class DefaultRootComponent(
             RootComponent.Tab.Settings -> Config.Settings
         }
         navigation.bringToFront(config)
+    }
+
+    override fun handleDeeplink(deeplinkUrl: String) {
+        val config = createConfigFromDeeplink(deeplinkUrl)
+        config?.let { navigation.bringToFront(it) }
+    }
+
+    private fun createConfigFromDeeplink(deeplinkUrl: String): Config? {
+        val isValid = DeeplinkValidator.isValidDeeplink(deeplinkUrl)
+        return if (isValid) {
+            val userId = deeplinkUrl.substringAfterLast("/").toIntOrNull()
+            Config.Search(userId)
+        } else {
+            null
+        }
     }
 
     @Serializable
