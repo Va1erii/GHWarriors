@@ -6,7 +6,9 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.decompose.value.subscribe
 import jp.vpopov.ghwarriors.app.RootPageComponent
 import jp.vpopov.ghwarriors.app.search.SearchRootComponent.Deeplink
 import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
@@ -56,6 +58,7 @@ class DefaultSearchRootComponent(
     private val profileComponentFactory: ProfileComponent.Factory
 ) : SearchRootComponent, ComponentContext by componentContext {
     private val navigation = StackNavigation<Config>()
+    private val _showNavBar = MutableValue(true)
     override val childStack: Value<ChildStack<*, SearchRootComponent.Child>> = childStack(
         source = navigation,
         serializer = Config.serializer(),
@@ -72,6 +75,17 @@ class DefaultSearchRootComponent(
         handleBackButton = true,
         childFactory = ::createChild,
     )
+    override val showNavBar: Value<Boolean> = _showNavBar
+
+    init {
+        childStack.subscribe(lifecycle) {
+            val showNavBar = when (it.active.configuration) {
+                is Config.Search -> true
+                else -> false
+            }
+            _showNavBar.value = showNavBar
+        }
+    }
 
     private fun createChild(
         config: Config,

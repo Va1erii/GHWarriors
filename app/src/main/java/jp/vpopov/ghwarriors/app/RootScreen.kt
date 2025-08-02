@@ -15,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,13 +41,16 @@ fun RootScreen(component: RootComponent) {
     val items by remember {
         derivedStateOf { pages.items.mapNotNull { it.instance?.createNavItem() } }
     }
+    var showNavBar by remember { mutableStateOf(true) }
     Scaffold(
         bottomBar = {
-            GHWNavigationBar(
-                selectedIndex = pages.selectedIndex,
-                onItemSelected = component::selectPage,
-                items = items
-            )
+            if (showNavBar) {
+                GHWNavigationBar(
+                    selectedIndex = pages.selectedIndex,
+                    onItemSelected = component::selectPage,
+                    items = items
+                )
+            }
         }
     ) { innerPadding ->
         ChildPages(
@@ -58,6 +63,8 @@ fun RootScreen(component: RootComponent) {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) { _, page ->
+            val showNavBarOnPage by page.showNavBar.subscribeAsState()
+            showNavBar = showNavBarOnPage
             when (page) {
                 is SearchRootComponent -> SearchRootContent(page, modifier = Modifier.fillMaxSize())
 

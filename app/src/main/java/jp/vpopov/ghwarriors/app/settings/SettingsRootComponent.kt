@@ -1,6 +1,8 @@
 package jp.vpopov.ghwarriors.app.settings
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.value.MutableValue
+import com.arkivanov.decompose.value.Value
 import jakarta.inject.Inject
 import jp.vpopov.ghwarriors.app.RootPageComponent
 
@@ -24,4 +26,5 @@ class DefaultSettingsRootComponentFactory @Inject constructor() : SettingsRootCo
 class DefaultSettingsRootComponent(
     componentContext: ComponentContext
 ) : SettingsRootComponent, ComponentContext by componentContext {
+    override val showNavBar: Value<Boolean> = MutableValue(true)
 }
