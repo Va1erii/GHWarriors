@@ -9,4 +9,6 @@
     <string name="following">Following</string>
     <string name="repositories">Repositories</string>
     <string name="profile">Profile</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="settings">Settings</string>
 </resources>

@@ -211,7 +211,8 @@ private fun ProfileContentPreview() {
                     description = "This is a sample repository.",
                     url = "",
                     language = "Kotlin",
-                    starsCount = 100
+                    starsCount = 100,
+                    isFork = false,
                 )
             ),
             onBookmarkToggle = {},

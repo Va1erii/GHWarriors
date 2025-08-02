@@ -7,13 +7,14 @@ import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.value.Value
+import jp.vpopov.ghwarriors.app.RootPageComponent
 import jp.vpopov.ghwarriors.app.search.SearchRootComponent.Deeplink
 import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
-interface SearchRootComponent {
+interface SearchRootComponent : RootPageComponent {
     val childStack: Value<ChildStack<*, Child>>
 
     sealed class Child {

@@ -1,7 +1,7 @@
 package jp.vpopov.ghwarriors.core.preferences.di
 
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.vpopov.ghwarriors.core.preferences.AppPreferences
@@ -12,6 +12,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 interface PreferencesModule {
     @Singleton
-    @Provides
+    @Binds
     fun provideAppPreferences(preferences: AppPreferencesDataStore): AppPreferences
 }
