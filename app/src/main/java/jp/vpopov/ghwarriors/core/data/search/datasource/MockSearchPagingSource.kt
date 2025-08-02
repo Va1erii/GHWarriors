@@ -1,10 +1,10 @@
-package jp.vpopov.ghwarriors.feature.search.data.datasource
+package jp.vpopov.ghwarriors.core.data.search.datasource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import jp.vpopov.ghwarriors.core.data.search.dto.SearchResponseDTO
+import jp.vpopov.ghwarriors.core.data.search.dto.SearchUserDTO
 import jp.vpopov.ghwarriors.core.logging.Logging
-import jp.vpopov.ghwarriors.feature.search.data.dto.SearchUserDTO
-import jp.vpopov.ghwarriors.feature.search.data.dto.SearchResponseDTO
 import kotlinx.coroutines.CancellationException
 
 class MockSearchPagingSource : PagingSource<Int, SearchUserDTO>() {

@@ -1,13 +1,13 @@
-package jp.vpopov.ghwarriors.feature.search.data
+package jp.vpopov.ghwarriors.core.data.search
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import jp.vpopov.ghwarriors.core.data.search.datasource.SearchPagingSource
+import jp.vpopov.ghwarriors.core.data.search.dto.asDomainModel
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.core.logging.Logging
-import jp.vpopov.ghwarriors.feature.search.data.datasource.SearchPagingSource
-import jp.vpopov.ghwarriors.feature.search.data.dto.asDomainModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

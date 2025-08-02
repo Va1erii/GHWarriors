@@ -8,5 +8,5 @@ data class UserProfileInfo(
     val bio: String?,
     val followersCount: Int,
     val followingCount: Int,
-    val totalPublicReposCount: Int,
+    val publicReposCount: Int,
 )

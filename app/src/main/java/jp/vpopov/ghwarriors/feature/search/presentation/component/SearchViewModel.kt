@@ -9,7 +9,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
-import jp.vpopov.ghwarriors.feature.search.data.SearchRepository
+import jp.vpopov.ghwarriors.core.data.search.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

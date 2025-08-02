@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 
-@Entity(tableName = "user_info")
+@Entity(tableName = "user_info_table")
 data class UserInfoEntity(
     @PrimaryKey val id: Int,
     @ColumnInfo(name = "user_name") val userName: String,

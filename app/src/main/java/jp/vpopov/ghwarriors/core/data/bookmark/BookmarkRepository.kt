@@ -4,33 +4,33 @@ import jp.vpopov.ghwarriors.core.database.dao.UserInfoDao
 import jp.vpopov.ghwarriors.core.database.entity.asDomainModel
 import jp.vpopov.ghwarriors.core.database.entity.toEntity
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
-import jp.vpopov.ghwarriors.core.extension.throwCancellation
+import jp.vpopov.ghwarriors.core.extension.throwOnCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface BookmarkRepository {
-    suspend fun getBookmarks(): Flow<List<UserInfo>>
-    suspend fun addBookmark(userInfo: UserInfo): Result<Unit>
-    suspend fun removeBookmark(userInfo: UserInfo): Result<Unit>
+    fun observeUserBookmarks(): Flow<List<UserInfo>>
+    suspend fun addUserBookmark(userInfo: UserInfo): Result<Unit>
+    suspend fun removeUserBookmark(userInfo: UserInfo): Result<Unit>
 }
 
 class BookmarkRepositoryImpl @Inject constructor(
     private val userInfoDao: UserInfoDao
 ) : BookmarkRepository {
 
-    override suspend fun getBookmarks(): Flow<List<UserInfo>> {
+    override fun observeUserBookmarks(): Flow<List<UserInfo>> {
         return userInfoDao.observeAll()
             .map { data -> data.map { it.asDomainModel() } }
     }
 
-    override suspend fun addBookmark(userInfo: UserInfo): Result<Unit> {
+    override suspend fun addUserBookmark(userInfo: UserInfo): Result<Unit> {
         return runCatching { userInfoDao.insertAll(userInfo.toEntity()) }
-            .throwCancellation()
+            .throwOnCancellation()
     }
 
-    override suspend fun removeBookmark(userInfo: UserInfo): Result<Unit> {
+    override suspend fun removeUserBookmark(userInfo: UserInfo): Result<Unit> {
         return runCatching { userInfoDao.delete(userInfo.toEntity()) }
-            .throwCancellation()
+            .throwOnCancellation()
     }
 }

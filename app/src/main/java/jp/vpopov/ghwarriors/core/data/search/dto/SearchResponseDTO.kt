@@ -1,4 +1,4 @@
-package jp.vpopov.ghwarriors.feature.search.data.dto
+package jp.vpopov.ghwarriors.core.data.search.dto
 
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import kotlinx.serialization.SerialName
