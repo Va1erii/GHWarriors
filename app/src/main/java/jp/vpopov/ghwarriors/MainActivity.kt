@@ -9,23 +9,11 @@ import com.arkivanov.decompose.defaultComponentContext
 import dagger.hilt.android.AndroidEntryPoint
 import jp.vpopov.ghwarriors.app.RootComponent
 import jp.vpopov.ghwarriors.app.RootScreen
-import jp.vpopov.ghwarriors.app.search.SearchRootComponent
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
-import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
-import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-//    @Inject
-//    lateinit var searchComponentFactory: SearchComponent.Factory
-//
-//    @Inject
-//    lateinit var profileComponentFactory: ProfileComponent.Factory
-//
-//    @Inject
-//    lateinit var searchRootComponentFactory: SearchRootComponent.Factory
-
     @Inject
     lateinit var rootComponentFactory: RootComponent.Factory
 

@@ -1,6 +1,5 @@
 package jp.vpopov.ghwarriors.app
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,69 +12,64 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.arkivanov.decompose.extensions.compose.pages.ChildPages
-import com.arkivanov.decompose.extensions.compose.pages.PagesScrollAnimation
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import jp.vpopov.ghwarriors.R
-import jp.vpopov.ghwarriors.app.bookmark.BookmarkRootComponent
-import jp.vpopov.ghwarriors.app.search.SearchRootComponent
 import jp.vpopov.ghwarriors.app.search.SearchRootContent
-import jp.vpopov.ghwarriors.app.settings.SettingsRootComponent
 import jp.vpopov.ghwarriors.core.designsystem.component.GHWNavigationBar
 import jp.vpopov.ghwarriors.core.designsystem.component.NavItem
 import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.util.ImageResource.VectorImage
 import jp.vpopov.ghwarriors.util.ImageResource.VectorResource
 
+private val navItems = RootComponent.Tab.entries
+    .sortedBy { it.index }
+    .map { tab -> tab to tab.createNavItem() }
+
 @Composable
 fun RootScreen(component: RootComponent) {
-    val pages by component.pages.subscribeAsState()
-    val items by remember {
-        derivedStateOf { pages.items.mapNotNull { it.instance?.createNavItem() } }
-    }
-    var showNavBar by remember { mutableStateOf(true) }
     Scaffold(
         bottomBar = {
+            val stack by component.stack.subscribeAsState()
+            val activeComponent = stack.active.instance
+            val showNavBar by activeComponent.component.showNavBar.subscribeAsState()
             if (showNavBar) {
                 GHWNavigationBar(
-                    selectedIndex = pages.selectedIndex,
-                    onItemSelected = component::selectPage,
-                    items = items
+                    selectedTab = activeComponent.tab,
+                    onItemSelected = { tab ->
+                        component.selectTab(tab)
+                    },
+                    items = navItems
                 )
             }
         }
     ) { innerPadding ->
-        ChildPages(
-            pages = component.pages,
-            onPageSelected = component::selectPage,
-            scrollAnimation = PagesScrollAnimation.Disabled,
+        Children(
+            stack = component.stack,
+            animation = stackAnimation(),
             modifier = Modifier
-                .background(Color.Cyan)
-                .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
-                .fillMaxSize()
-        ) { _, page ->
-            val showNavBarOnPage by page.showNavBar.subscribeAsState()
-            showNavBar = showNavBarOnPage
-            when (page) {
-                is SearchRootComponent -> SearchRootContent(page, modifier = Modifier.fillMaxSize())
+                .consumeWindowInsets(innerPadding)
+                .fillMaxSize(),
+        ) { child ->
+            when (val instance = child.instance) {
+                is RootComponent.Child.Search -> SearchRootContent(
+                    component = instance.component,
+                    modifier = Modifier.fillMaxSize()
+                )
 
-                is BookmarkRootComponent -> Box(
+                is RootComponent.Child.Bookmark -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("Bookmark")
                 }
 
-                is SettingsRootComponent -> Box(
+                is RootComponent.Child.Settings -> Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
@@ -86,26 +80,24 @@ fun RootScreen(component: RootComponent) {
     }
 }
 
-private fun RootPageComponent.createNavItem(): NavItem? {
+private fun RootComponent.Tab.createNavItem(): NavItem {
     return when (this) {
-        is SearchRootComponent -> NavItem(
+        RootComponent.Tab.Search -> NavItem(
             title = Localization.search,
             selectedIcon = VectorImage(Icons.Filled.Home),
             unselectedIcon = VectorImage(Icons.Outlined.Home),
         )
 
-        is BookmarkRootComponent -> NavItem(
+        RootComponent.Tab.Bookmarks -> NavItem(
             title = Localization.bookmarks,
             selectedIcon = VectorResource(R.drawable.ic_bookmark_filled),
             unselectedIcon = VectorResource(R.drawable.ic_bookmark_outlined),
         )
 
-        is SettingsRootComponent -> NavItem(
+        RootComponent.Tab.Settings -> NavItem(
             title = Localization.settings,
             selectedIcon = VectorImage(Icons.Filled.Settings),
             unselectedIcon = VectorImage(Icons.Outlined.Settings),
         )
-
-        else -> null
     }
 }

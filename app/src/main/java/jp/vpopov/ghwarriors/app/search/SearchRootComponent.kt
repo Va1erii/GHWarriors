@@ -10,7 +10,6 @@ import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.decompose.value.subscribe
 import jp.vpopov.ghwarriors.app.RootPageComponent
-import jp.vpopov.ghwarriors.app.search.SearchRootComponent.Deeplink
 import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
 import kotlinx.serialization.Serializable
@@ -27,12 +26,8 @@ interface SearchRootComponent : RootPageComponent {
     interface Factory {
         fun create(
             componentContext: ComponentContext,
-            deeplink: Deeplink? = null
+            userId: Int? = null,
         ): SearchRootComponent
-    }
-
-    sealed class Deeplink {
-        data class Profile(val userId: Int) : Deeplink()
     }
 }
 
@@ -42,10 +37,10 @@ class DefaultSearchRootComponentFactory @Inject constructor(
 ) : SearchRootComponent.Factory {
     override fun create(
         componentContext: ComponentContext,
-        deeplink: Deeplink?
+        userId: Int?
     ): SearchRootComponent = DefaultSearchRootComponent(
         componentContext = componentContext,
-        deeplink = deeplink,
+        userId = userId,
         searchComponentFactory = searchComponentFactory,
         profileComponentFactory = profileComponentFactory
     )
@@ -53,7 +48,7 @@ class DefaultSearchRootComponentFactory @Inject constructor(
 
 class DefaultSearchRootComponent(
     componentContext: ComponentContext,
-    deeplink: Deeplink?,
+    private val userId: Int?,
     private val searchComponentFactory: SearchComponent.Factory,
     private val profileComponentFactory: ProfileComponent.Factory
 ) : SearchRootComponent, ComponentContext by componentContext {
@@ -63,13 +58,10 @@ class DefaultSearchRootComponent(
         source = navigation,
         serializer = Config.serializer(),
         initialStack = {
-            when (deeplink) {
-                is Deeplink.Profile -> listOf(
-                    Config.Search,
-                    Config.Profile(userId = deeplink.userId)
-                )
-
-                null -> listOf(Config.Search)
+            if (userId != null) {
+                listOf(Config.Search, Config.Profile(userId = userId))
+            } else {
+                listOf(Config.Search)
             }
         },
         handleBackButton = true,

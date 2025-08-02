@@ -18,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import jp.vpopov.ghwarriors.R
+import jp.vpopov.ghwarriors.app.RootComponent.Tab
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.util.ImageResource
@@ -41,10 +42,10 @@ data class NavItem(
 )
 
 @Composable
-fun GHWNavigationBar(
-    selectedIndex: Int,
-    onItemSelected: (Int) -> Unit,
-    items: List<NavItem>,
+fun <Tab> GHWNavigationBar(
+    selectedTab: Tab,
+    onItemSelected: (Tab) -> Unit,
+    items: List<Pair<Tab, NavItem>>,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
@@ -52,10 +53,10 @@ fun GHWNavigationBar(
         modifier = modifier,
     ) {
         val itemSelected by rememberUpdatedState(onItemSelected)
-        items.forEachIndexed { index, item ->
+        items.forEach { (tab, item) ->
             NavigationBarItem(
                 icon = {
-                    val icon = if (selectedIndex == index) {
+                    val icon = if (selectedTab == tab) {
                         item.selectedIcon
                     } else {
                         item.unselectedIcon
@@ -73,8 +74,8 @@ fun GHWNavigationBar(
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
-                selected = selectedIndex == index,
-                onClick = { itemSelected(index) }
+                selected = selectedTab == tab,
+                onClick = { itemSelected(tab) }
             )
         }
     }
@@ -84,30 +85,30 @@ fun GHWNavigationBar(
 @Composable
 private fun GHWNavigationBarPreview() {
     val items = listOf(
-        NavItem(
+        Tab.Search to NavItem(
             title = Localization.search,
             selectedIcon = VectorImage(Icons.Filled.Home),
             unselectedIcon = VectorImage(Icons.Outlined.Home),
         ),
-        NavItem(
+        Tab.Bookmarks to NavItem(
             title = Localization.bookmarks,
             selectedIcon = VectorResource(R.drawable.ic_bookmark_filled),
             unselectedIcon = VectorResource(R.drawable.ic_bookmark_outlined)
         ),
-        NavItem(
+        Tab.Settings to NavItem(
             title = Localization.settings,
             selectedIcon = VectorImage(Icons.Filled.Settings),
             unselectedIcon = VectorImage(Icons.Outlined.Settings)
         )
     )
     GHWarriorsTheme {
-        var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+        var selectedTab by rememberSaveable { mutableStateOf(Tab.Search) }
         Scaffold(
             bottomBar = {
                 GHWNavigationBar(
-                    selectedIndex = selectedIndex,
+                    selectedTab = selectedTab,
                     onItemSelected = {
-                        selectedIndex = it
+                        selectedTab = it
                     },
                     items = items
                 )
