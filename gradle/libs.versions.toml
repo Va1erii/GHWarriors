@@ -18,6 +18,7 @@ coilVersion = "3.3.0"
 timberVersion = "5.0.1"
 decomposeVersion = "3.3.0"
 roomVersion = "2.7.2"
+datastoreVersion = "1.1.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,6 +52,7 @@ decompose-compose = { group = "com.arkivanov.decompose", name = "extensions-comp
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastoreVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

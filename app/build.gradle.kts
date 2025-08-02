@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.decompose)
     implementation(libs.decompose.compose)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.hilt.android)
     ksp(libs.hilt.ksp)
     implementation(libs.androidx.room.runtime)
