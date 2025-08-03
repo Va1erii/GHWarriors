@@ -40,13 +40,13 @@ class DefaultSearchComponent(
     private val viewModelFactory: SearchViewModel.Factory
 ) : SearchComponent, ComponentContext by componentContext {
     private val viewModel: SearchViewModel = instanceKeeper.getOrCreate {
-        viewModelFactory.create(stateKeeper.consume<String>(STATE_KEY, String.serializer()))
+        viewModelFactory.create(stateKeeper.consume(QUERY_KEY, String.serializer()))
     }
 
     override val model: StateFlow<SearchState> = viewModel.state
 
     init {
-        stateKeeper.register(STATE_KEY, String.serializer()) { viewModel.state.value.query }
+        stateKeeper.register(QUERY_KEY, String.serializer()) { viewModel.state.value.query }
     }
 
     override fun search(query: String) {
@@ -56,6 +56,6 @@ class DefaultSearchComponent(
     override fun onUserSelected(user: UserInfo) = userSelected(user)
 
     private companion object {
-        const val STATE_KEY = "search_state"
+        const val QUERY_KEY = "search_query"
     }
 }

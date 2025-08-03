@@ -29,16 +29,16 @@ import jp.vpopov.ghwarriors.R
 import jp.vpopov.ghwarriors.app.RootComponent.Tab
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.extension.Localization
-import jp.vpopov.ghwarriors.util.ImageResource
-import jp.vpopov.ghwarriors.util.ImageResource.VectorImage
-import jp.vpopov.ghwarriors.util.ImageResource.VectorResource
-import jp.vpopov.ghwarriors.util.imageVector
+import jp.vpopov.ghwarriors.util.PainterResource
+import jp.vpopov.ghwarriors.util.PainterResource.VectorImage
+import jp.vpopov.ghwarriors.util.PainterResource.DrawableResource
+import jp.vpopov.ghwarriors.util.painter
 
 @Immutable
 data class NavItem(
     @StringRes val title: Int,
-    val selectedIcon: ImageResource,
-    val unselectedIcon: ImageResource,
+    val selectedIcon: PainterResource,
+    val unselectedIcon: PainterResource,
 )
 
 @Composable
@@ -62,7 +62,7 @@ fun <Tab> GHWNavigationBar(
                         item.unselectedIcon
                     }
                     Icon(
-                        icon.imageVector(),
+                        icon.painter(),
                         tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = stringResource(item.title)
                     )
@@ -92,8 +92,8 @@ private fun GHWNavigationBarPreview() {
         ),
         Tab.Bookmarks to NavItem(
             title = Localization.bookmarks,
-            selectedIcon = VectorResource(R.drawable.ic_bookmark_filled),
-            unselectedIcon = VectorResource(R.drawable.ic_bookmark_outlined)
+            selectedIcon = DrawableResource(R.drawable.ic_bookmark_filled),
+            unselectedIcon = DrawableResource(R.drawable.ic_bookmark_outlined)
         ),
         Tab.Settings to NavItem(
             title = Localization.settings,

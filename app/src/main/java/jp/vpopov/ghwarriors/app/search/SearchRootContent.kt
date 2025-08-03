@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import jp.vpopov.ghwarriors.app.search.SearchRootComponent.Child
-import jp.vpopov.ghwarriors.feature.profile.presentation.ui.ProfileContent
 import jp.vpopov.ghwarriors.feature.profile.presentation.ui.ProfileScreen
 import jp.vpopov.ghwarriors.feature.search.presentation.ui.SearchContent
 

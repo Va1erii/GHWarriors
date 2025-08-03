@@ -23,8 +23,8 @@ import jp.vpopov.ghwarriors.app.search.SearchRootContent
 import jp.vpopov.ghwarriors.core.designsystem.component.GHWNavigationBar
 import jp.vpopov.ghwarriors.core.designsystem.component.NavItem
 import jp.vpopov.ghwarriors.core.extension.Localization
-import jp.vpopov.ghwarriors.util.ImageResource.VectorImage
-import jp.vpopov.ghwarriors.util.ImageResource.VectorResource
+import jp.vpopov.ghwarriors.util.PainterResource.VectorImage
+import jp.vpopov.ghwarriors.util.PainterResource.DrawableResource
 
 private val navItems = RootComponent.Tab.entries
     .sortedBy { it.index }
@@ -90,8 +90,8 @@ private fun RootComponent.Tab.createNavItem(): NavItem {
 
         RootComponent.Tab.Bookmarks -> NavItem(
             title = Localization.bookmarks,
-            selectedIcon = VectorResource(R.drawable.ic_bookmark_filled),
-            unselectedIcon = VectorResource(R.drawable.ic_bookmark_outlined),
+            selectedIcon = DrawableResource(R.drawable.ic_bookmark_filled),
+            unselectedIcon = DrawableResource(R.drawable.ic_bookmark_outlined),
         )
 
         RootComponent.Tab.Settings -> NavItem(
