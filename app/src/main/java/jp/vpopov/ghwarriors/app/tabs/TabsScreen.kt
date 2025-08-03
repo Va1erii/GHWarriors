@@ -1,6 +1,5 @@
 package jp.vpopov.ghwarriors.app.tabs
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,10 +10,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
@@ -25,6 +22,7 @@ import jp.vpopov.ghwarriors.core.designsystem.component.NavItem
 import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.feature.bookmark.presentation.ui.BookmarkContent
 import jp.vpopov.ghwarriors.feature.search.presentation.ui.SearchContent
+import jp.vpopov.ghwarriors.feature.settings.presentation.ui.SettingsContent
 import jp.vpopov.ghwarriors.util.PainterResource.DrawableResource
 import jp.vpopov.ghwarriors.util.PainterResource.VectorImage
 
@@ -71,12 +69,10 @@ fun TabsScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                is TabsComponent.Child.Settings -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Settings")
-                }
+                is TabsComponent.Child.Settings -> SettingsContent(
+                    component = instance.component,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

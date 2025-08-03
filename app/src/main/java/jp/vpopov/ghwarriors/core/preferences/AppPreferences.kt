@@ -11,12 +11,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jp.vpopov.ghwarriors.core.domain.model.ThemeConfig
 import jp.vpopov.ghwarriors.core.domain.model.ThemePalette
+import jp.vpopov.ghwarriors.core.extension.throwOnCancellation
+import jp.vpopov.ghwarriors.core.logging.Logging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 interface AppPreferences {
     fun observeTheme(): Flow<ThemeConfig>
+    suspend fun setTheme(theme: ThemeConfig)
     fun observeThemePalette(): Flow<ThemePalette>
 }
 
@@ -49,5 +52,17 @@ class AppPreferencesDataStore @Inject constructor(
                 .find { it.name == preferences[themePaletteKey] }
                 ?: ThemePalette.NATURAL_GREEN
         }.catch { emit(ThemePalette.NATURAL_GREEN) }
+    }
+
+    override suspend fun setTheme(theme: ThemeConfig) {
+        runCatching {
+            dataStore.updateData { preferences ->
+                preferences.toMutablePreferences().apply {
+                    set(themeConfigKey, theme.name)
+                }
+            }
+        }
+            .throwOnCancellation()
+            .onFailure { Logging.e(it) { "Failed to set theme: ${theme.name}" } }
     }
 }

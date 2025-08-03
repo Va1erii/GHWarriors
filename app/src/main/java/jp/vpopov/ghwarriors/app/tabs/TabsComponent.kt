@@ -7,10 +7,10 @@ import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.value.Value
 import jakarta.inject.Inject
-import jp.vpopov.ghwarriors.app.settings.SettingsRootComponent
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.feature.bookmark.presentation.component.BookmarkComponent
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
+import jp.vpopov.ghwarriors.feature.settings.presentation.component.SettingsComponent
 import kotlinx.serialization.Serializable
 
 interface TabsComponent {
@@ -35,7 +35,7 @@ interface TabsComponent {
             override val tab: Tab = Tab.Bookmarks
         }
 
-        class Settings(val component: SettingsRootComponent) : Child() {
+        class Settings(val component: SettingsComponent) : Child() {
             override val tab: Tab = Tab.Settings
         }
     }
@@ -50,7 +50,7 @@ interface TabsComponent {
 class DefaultTabsComponentFactory @Inject constructor(
     private val searchComponentFactory: SearchComponent.Factory,
     private val bookmarkComponentFactory: BookmarkComponent.Factory,
-    private val settingsRootComponentFactory: SettingsRootComponent.Factory
+    private val settingsComponentFactory: SettingsComponent.Factory
 ) : TabsComponent.Factory {
     override fun create(
         componentContext: ComponentContext,
@@ -61,7 +61,7 @@ class DefaultTabsComponentFactory @Inject constructor(
             onUserSelected = onUserSelected,
             searchComponentFactory = searchComponentFactory,
             bookmarkComponentFactory = bookmarkComponentFactory,
-            settingsRootComponentFactory = settingsRootComponentFactory
+            settingsComponentFactory = settingsComponentFactory
         )
     }
 }
@@ -71,7 +71,7 @@ class DefaultTabsComponent(
     private val onUserSelected: (UserInfo) -> Unit,
     private val searchComponentFactory: SearchComponent.Factory,
     private val bookmarkComponentFactory: BookmarkComponent.Factory,
-    private val settingsRootComponentFactory: SettingsRootComponent.Factory
+    private val settingsComponentFactory: SettingsComponent.Factory
 ) : TabsComponent, ComponentContext by componentContext {
     private val navigation = StackNavigation<Config>()
 
@@ -118,7 +118,7 @@ class DefaultTabsComponent(
     private fun createSettingsChild(
         componentContext: ComponentContext
     ): TabsComponent.Child.Settings {
-        val component = settingsRootComponentFactory.create(componentContext)
+        val component = settingsComponentFactory.create(componentContext)
         return TabsComponent.Child.Settings(component)
     }
 

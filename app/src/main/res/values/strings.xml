@@ -28,4 +28,12 @@
     <string name="delete">Delete</string>
     <string name="bookmarks_add">Add bookmark</string>
     <string name="bookmarks_remove">Remove bookmark</string>
+    <string name="theme_title">Theme</string>
+    <string name="theme_description">Choose your preferred theme</string>
+    <string name="theme_system_title">Follow System</string>
+    <string name="theme_system_description">Adapts to your system theme</string>
+    <string name="theme_light_title">Light</string>
+    <string name="theme_light_description">Light theme for better visibility in bright environments</string>
+    <string name="theme_dark_title">Dark</string>
+    <string name="theme_dark_description">Dark theme for reduced eye strain in low light</string>
 </resources>
