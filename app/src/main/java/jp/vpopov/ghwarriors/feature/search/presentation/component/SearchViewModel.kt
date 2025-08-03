@@ -13,6 +13,7 @@ import jp.vpopov.ghwarriors.core.data.bookmark.BookmarkRepository
 import jp.vpopov.ghwarriors.core.data.search.SearchRepository
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent.UserWithBookmarkInfo
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +41,7 @@ class SearchViewModel @AssistedInject constructor(
 ) : DecomposeViewModel() {
     private val bookmarkedUserIds = MutableStateFlow(emptySet<Int>())
     private val _state = MutableStateFlow(SearchState(query = query ?: ""))
+    private var searchJob: Job? = null
     val state: StateFlow<SearchState> = _state.asStateFlow()
 
     init {
@@ -82,7 +84,8 @@ class SearchViewModel @AssistedInject constructor(
                         )
                     )
                 }
-                viewModelScope.launch {
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
                     searchRepository.searchUsers(query)
                         .cachedIn(viewModelScope)
                         .combine(bookmarkedUserIds) { pagingData, bookmarkedUserIds ->

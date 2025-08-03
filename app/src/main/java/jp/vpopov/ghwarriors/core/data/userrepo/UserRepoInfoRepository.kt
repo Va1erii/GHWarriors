@@ -14,6 +14,7 @@ import jp.vpopov.ghwarriors.core.domain.model.UserRepoInfo
 import jp.vpopov.ghwarriors.core.logging.Logging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import javax.inject.Inject
 
 interface UserRepoInfoRepository {
@@ -28,6 +29,7 @@ class UserRepoInfoRepositoryImpl @Inject constructor(
 
     override fun fetchRepositories(userId: Int): Flow<PagingData<UserRepoInfo>> {
         Logging.d { "Fetch user repositories, userId=($userId)" }
+        repoPagingSource?.invalidate()
         return Pager(
             config = PagingConfig(
                 pageSize = UserRepoPagingSource.PER_PAGE,
@@ -45,6 +47,7 @@ class UserRepoInfoRepositoryImpl @Inject constructor(
         )
             .flow
             .map { pagingData -> pagingData.map { it.asDomainModel() } }
+            .onCompletion { repoPagingSource = null }
     }
 
     override fun refreshRepositories() {
