@@ -5,7 +5,7 @@ import retrofit2.HttpException
 import java.net.SocketTimeoutException
 
 object ErrorMapper {
-    fun convert(exception: Exception): AppError {
+    fun convert(exception: Throwable): AppError {
         return when (exception) {
             is SocketTimeoutException -> NetworkError.Timeout(exception)
             is IOException -> NetworkError.NoInternetConnection(exception)
@@ -13,6 +13,7 @@ object ErrorMapper {
                 val code = exception.code()
                 NetworkError.ServerError(code)
             }
+
             else -> UnknownError(exception)
         }
     }

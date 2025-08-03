@@ -4,6 +4,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import jp.vpopov.ghwarriors.core.data.search.datasource.MockSearchPagingSource
+import jp.vpopov.ghwarriors.core.data.search.datasource.Scenario
 import jp.vpopov.ghwarriors.core.data.search.datasource.SearchPagingSource
 import jp.vpopov.ghwarriors.core.data.search.dto.asDomainModel
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
@@ -29,11 +31,11 @@ class SearchRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-//                MockSearchPagingSource()
-                SearchPagingSource(
-                    searchApi = searchApi,
-                    query = query
-                )
+                MockSearchPagingSource(scenario = Scenario.NO_CONNECTION_ERROR)
+//                SearchPagingSource(
+//                    searchApi = searchApi,
+//                    query = query
+//                )
             }
         )
             .flow

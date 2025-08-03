@@ -1,9 +1,11 @@
 package jp.vpopov.ghwarriors.feature.search.presentation.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,12 +13,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +42,9 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
+import jp.vpopov.ghwarriors.core.error.ErrorMapper
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
+import jp.vpopov.ghwarriors.feature.shared.presentation.ui.ErrorContent
 import kotlinx.coroutines.delay
 
 
@@ -78,9 +87,10 @@ fun SearchContent(
                 .padding(start = 16.dp, end = 16.dp)
         )
         SearchContentSection(
+            query = query,
             data = users,
             onUserClick = { user -> component.onUserSelected(user) },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -88,33 +98,43 @@ fun SearchContent(
 
 @Composable
 private fun SearchContentSection(
+    query: String,
     data: LazyPagingItems<UserInfo>,
     onUserClick: (UserInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isRefreshLoading by remember(data.loadState.refresh) {
+    val isLoading = data.loadState.refresh is LoadState.Loading
+    val isIdle = data.loadState.isIdle
+    val error by remember(data.loadState.refresh) {
         derivedStateOf {
-            data.loadState.refresh is LoadState.Loading
+            val errorState = data.loadState.refresh as? LoadState.Error
+            errorState?.let { ErrorMapper.convert(it.error) }
         }
     }
-    val isNotLoading = data.loadState.isIdle
     when {
-        isRefreshLoading -> {
-            LoadingContent(modifier = modifier)
-        }
+        isLoading -> LoadingContent(modifier = modifier)
 
-        // No results found
-        isNotLoading && data.itemCount == 0 -> {
-            EmptyQueryContent(modifier = modifier)
-        }
-        // Show search results
-        else -> {
-            PagingSearchResultsList(
-                data = data,
-                onUserClick = onUserClick,
+        error != null -> error?.let {
+            ErrorContent(
+                appError = it,
+                onRetry = { data.retry() },
                 modifier = modifier
             )
         }
+
+        isIdle && query.isEmpty() -> EmptyQueryContent()
+
+        isIdle && data.itemCount == 0 && query.isNotEmpty() -> NoDataFoundContent(
+            query, modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        )
+
+        else -> PagingSearchResultsList(
+            data = data,
+            onUserClick = onUserClick,
+            modifier = modifier
+        )
     }
 }
 
@@ -196,14 +216,84 @@ private fun PagingSearchResultsList(
 
             is LoadState.Error -> {
                 item {
-//                    PagingErrorItem(
-//                        error = loadState.error,
-//                        onRetry = { data.retry() }
-//                    )
+                    LoadMoreErrorContent(onRetry = { data.retry() })
                 }
             }
 
             else -> {}
+        }
+    }
+}
+
+@Composable
+private fun NoDataFoundContent(
+    query: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "No users found",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "No users found for \"$query\". Try searching with different keywords.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun LoadMoreErrorContent(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Failed to load more",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedButton(
+            onClick = onRetry
+        ) {
+            Text("Retry")
         }
     }
 }
