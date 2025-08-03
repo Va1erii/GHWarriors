@@ -2,6 +2,7 @@ package jp.vpopov.ghwarriors.app.tabs
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -55,6 +56,7 @@ fun TabsScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
+                .displayCutoutPadding()
                 .fillMaxSize(),
         ) { child ->
             when (val instance = child.instance) {

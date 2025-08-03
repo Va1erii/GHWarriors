@@ -1,6 +1,7 @@
 package jp.vpopov.ghwarriors.feature.profile.presentation.ui
 
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -49,8 +50,9 @@ fun ProfileScreen(
         ProfileContent(
             component = component,
             modifier = Modifier
-                .consumeWindowInsets(innerPadding)
                 .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .displayCutoutPadding()
                 .fillMaxSize()
         )
     }
