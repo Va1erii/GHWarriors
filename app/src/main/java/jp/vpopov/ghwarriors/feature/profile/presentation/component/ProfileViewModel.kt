@@ -54,6 +54,7 @@ class ProfileViewModel @AssistedInject constructor(
 
     private fun refreshProfile() {
         viewModelScope.launch {
+            _state.update { ProfileState.Loading(userId) }
             userRepository.fetchProfile(userId)
                 .onSuccess { userProfileInfo ->
                     _state.update {
@@ -77,6 +78,10 @@ class ProfileViewModel @AssistedInject constructor(
 
     fun refresh() {
         refreshProfile()
+        userRepoInfoRepository.refreshRepositories()
+    }
+
+    fun refreshRepositories() {
         userRepoInfoRepository.refreshRepositories()
     }
 

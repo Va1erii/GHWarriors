@@ -5,7 +5,6 @@ sealed interface AppError {
 }
 
 class UnknownError(override val cause: Throwable?) : AppError
-class DatabaseError(override val cause: Throwable?) : AppError
 
 sealed class NetworkError : AppError {
     class NoInternetConnection(override val cause: Throwable? = null) : NetworkError()

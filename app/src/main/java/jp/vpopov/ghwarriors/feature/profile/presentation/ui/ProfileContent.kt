@@ -7,17 +7,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -47,9 +53,14 @@ import jp.vpopov.ghwarriors.R
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.domain.model.UserProfileInfo
 import jp.vpopov.ghwarriors.core.domain.model.UserRepoInfo
+import jp.vpopov.ghwarriors.core.error.AppError
+import jp.vpopov.ghwarriors.core.error.ErrorMapper
+import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
 import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileState
 import jp.vpopov.ghwarriors.feature.shared.presentation.ui.ErrorContent
+import jp.vpopov.ghwarriors.feature.shared.presentation.ui.LoadMoreError
+import jp.vpopov.ghwarriors.feature.shared.presentation.ui.LoadingMore
 
 @Composable
 fun ProfileContent(
@@ -60,13 +71,20 @@ fun ProfileContent(
     val repositories = component.repositories.collectAsLazyPagingItems()
     when (val state = model) {
         is ProfileState.Loading -> LoadingContent(modifier)
-        is ProfileState.Error -> ErrorContent(state.error, modifier)
+
+        is ProfileState.Error -> ErrorContent(
+            appError = state.error,
+            onRetry = component::onRefresh,
+            modifier = modifier
+        )
+
         is ProfileState.Success -> ProfileContent(
             state = state,
-            repositories = repositories,
+            data = repositories,
             onBookmarkToggle = component::onUserBookmarkToggle,
             onRepositorySelected = component::onRepositorySelected,
-            modifier = modifier.fillMaxSize()
+            onRepositoryRetry = component::onRefreshRepositories,
+            modifier = modifier
         )
     }
 }
@@ -86,16 +104,26 @@ private fun LoadingContent(
 @Composable
 private fun ProfileContent(
     state: ProfileState.Success,
-    repositories: LazyPagingItems<UserRepoInfo>,
+    data: LazyPagingItems<UserRepoInfo>,
     onBookmarkToggle: () -> Unit,
     onRepositorySelected: (UserRepoInfo) -> Unit,
+    onRepositoryRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val error by remember(data.loadState.refresh) {
+        derivedStateOf {
+            val errorState = data.loadState.refresh as? LoadState.Error
+            errorState?.let { ErrorMapper.convert(it.error) }
+        }
+    }
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item(key = state.userProfileInfo.userName) {
+        item(
+            key = state.userProfileInfo.userName,
+            contentType = "header"
+        ) {
             ProfileHeaderContent(
                 profile = state.userProfileInfo,
                 onBookmarkToggle = onBookmarkToggle,
@@ -103,11 +131,42 @@ private fun ProfileContent(
             )
             Spacer(Modifier.height(24.dp))
         }
-        items(
-            count = repositories.itemCount,
-            key = repositories.itemKey { it.id }
+        repositoryListSection(
+            data = data,
+            error = error,
+            onRepositorySelected = onRepositorySelected,
+            onRepositoryRetry = onRepositoryRetry,
+        )
+    }
+}
+
+private fun LazyListScope.repositoryListSection(
+    data: LazyPagingItems<UserRepoInfo>,
+    error: AppError?,
+    onRepositorySelected: (UserRepoInfo) -> Unit,
+    onRepositoryRetry: () -> Unit
+) {
+    val isLoading = data.loadState.refresh is LoadState.Loading
+    when {
+        isLoading -> items(
+            count = 4,
+            key = { it },
+            contentType = { "loading_item" }
+        ) { RepositoryListItemShimmer() }
+
+        error != null -> item(
+            key = "error_item",
+            contentType = "error_item"
+        ) {
+            RepositoryListSectionError(onRetry = onRepositoryRetry)
+        }
+
+        else -> items(
+            count = data.itemCount,
+            key = data.itemKey { it.id },
+            contentType = { "repository_item" }
         ) { index ->
-            val repository = repositories[index]
+            val repository = data[index]
             val repositoryClick by rememberUpdatedState(onRepositorySelected)
             if (repository != null) {
                 RepositoryListItem(
@@ -116,6 +175,56 @@ private fun ProfileContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        }
+    }
+
+    when (data.loadState.append) {
+        is LoadState.Loading -> item(
+            key = "loading_more_item",
+            contentType = "loading_more_item"
+        ) { LoadingMore(modifier = Modifier.fillMaxWidth()) }
+
+        is LoadState.Error -> item(
+            key = "load_more_error_item",
+            contentType = "load_more_error_item"
+        ) { LoadMoreError(onRetry = { data.retry() }) }
+
+        else -> Unit
+    }
+}
+
+@Composable
+private fun RepositoryListSectionError(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+    ) {
+        Text(
+            text = stringResource(Localization.error_common_title),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(Localization.error_common_message),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Button(
+            onClick = onRetry
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(Localization.try_again))
         }
     }
 }

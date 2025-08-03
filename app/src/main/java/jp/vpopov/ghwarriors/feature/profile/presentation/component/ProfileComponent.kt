@@ -12,6 +12,8 @@ interface ProfileComponent {
     val model: StateFlow<ProfileState>
     val repositories: Flow<PagingData<UserRepoInfo>>
 
+    fun onRefresh()
+    fun onRefreshRepositories()
     fun onRepositorySelected(repoInfo: UserRepoInfo)
     fun onUserBookmarkToggle()
     fun onBackButtonPressed()
@@ -62,5 +64,13 @@ class DefaultProfileComponent(
     }
 
     override fun onUserBookmarkToggle() {
+    }
+
+    override fun onRefresh() {
+        viewModel.refresh()
+    }
+
+    override fun onRefreshRepositories() {
+        viewModel.refreshRepositories()
     }
 }
