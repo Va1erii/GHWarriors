@@ -1,14 +1,17 @@
 package jp.vpopov.ghwarriors.feature.search.presentation.component
 
+import androidx.paging.PagingData
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.serializer
 import javax.inject.Inject
 
 interface SearchComponent {
-    val model: StateFlow<SearchState>
+    val query: Flow<String>
+    val users: Flow<PagingData<UserInfo>>
 
     fun search(query: String)
     fun onUserSelected(user: UserInfo)
@@ -43,7 +46,8 @@ class DefaultSearchComponent(
         viewModelFactory.create(stateKeeper.consume(QUERY_KEY, String.serializer()))
     }
 
-    override val model: StateFlow<SearchState> = viewModel.state
+    override val query: Flow<String> = viewModel.state.map { it.query }
+    override val users: Flow<PagingData<UserInfo>> = viewModel.state.map { it.users }
 
     init {
         stateKeeper.register(QUERY_KEY, String.serializer()) { viewModel.state.value.query }

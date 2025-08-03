@@ -47,7 +47,7 @@ fun SearchInputSection(
         modifier = modifier
             .heightIn(min = 56.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .padding(start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -55,7 +55,7 @@ fun SearchInputSection(
             imageVector = Icons.Default.Search,
             contentDescription = stringResource(R.string.search),
             modifier = Modifier.padding(end = 12.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         TextField(

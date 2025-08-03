@@ -13,6 +13,7 @@ import jp.vpopov.ghwarriors.core.data.search.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -56,7 +57,7 @@ class SearchViewModel @AssistedInject constructor(
                 viewModelScope.launch {
                     searchRepository.searchUsers(query)
                         .cachedIn(viewModelScope)
-                        .collect { pagingData ->
+                        .collectLatest { pagingData ->
                             _state.update { it.copy(users = pagingData) }
                         }
                 }

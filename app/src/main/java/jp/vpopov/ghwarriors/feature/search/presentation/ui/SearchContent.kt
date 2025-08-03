@@ -15,13 +15,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,10 +35,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
-import jp.vpopov.ghwarriors.core.logging.Logging
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 
 
 @Composable
@@ -46,10 +44,17 @@ fun SearchContent(
     component: SearchComponent,
     modifier: Modifier = Modifier
 ) {
-    val state by component.model.collectAsState()
-    val users = component.model.map { it.users }.collectAsLazyPagingItems()
-    var searchQuery by remember { mutableStateOf(state.query) }
+    val query by component.query.collectAsState("")
+    val users = component.users.collectAsLazyPagingItems()
+    var searchQuery by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(query) {
+        // Sync state with UI if necessary
+        if (searchQuery != query) {
+            searchQuery = query
+        }
+    }
 
     LaunchedEffect(searchQuery) {
         if (searchQuery.isNotEmpty()) {
@@ -73,7 +78,6 @@ fun SearchContent(
                 .padding(start = 16.dp, end = 16.dp)
         )
         SearchContentSection(
-            query = searchQuery,
             data = users,
             onUserClick = { user -> component.onUserSelected(user) },
             modifier = Modifier.fillMaxSize()
@@ -84,19 +88,19 @@ fun SearchContent(
 
 @Composable
 private fun SearchContentSection(
-    query: String,
     data: LazyPagingItems<UserInfo>,
     onUserClick: (UserInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(data) {
-        Logging.d { "Loading state=(${data.loadState})" }
+    val isRefreshLoading by remember(data.loadState.refresh) {
+        derivedStateOf {
+            data.loadState.refresh is LoadState.Loading
+        }
     }
-    val isLoading = data.loadState.refresh is LoadState.Loading
     val isNotLoading = data.loadState.isIdle
     when {
-        isLoading -> {
-//            LoadingContent(modifier = modifier)
+        isRefreshLoading -> {
+            LoadingContent(modifier = modifier)
         }
 
         // No results found
@@ -106,7 +110,6 @@ private fun SearchContentSection(
         // Show search results
         else -> {
             PagingSearchResultsList(
-                query = query,
                 data = data,
                 onUserClick = onUserClick,
                 modifier = modifier
@@ -151,10 +154,8 @@ private fun EmptyQueryContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PagingSearchResultsList(
-    query: String,
     data: LazyPagingItems<UserInfo>,
     onUserClick: (UserInfo) -> Unit,
     modifier: Modifier = Modifier
@@ -205,33 +206,18 @@ private fun PagingSearchResultsList(
             else -> {}
         }
     }
+}
 
-    // Handle initial loading state
-    when (
-        val refreshState = data.loadState.refresh) {
-        is LoadState.Loading -> {
-            if (data.itemCount == 0) {
-//                LoadingContent(modifier = modifier)
-            }
-        }
-
-        is LoadState.Error -> {
-            if (data.itemCount == 0) {
-//                PagingErrorContent(
-//                    error = refreshState.error,
-//                    onRetry = { data.retry() },
-//                    modifier = modifier
-//                )
-            }
-        }
-
-        is LoadState.NotLoading -> {
-            if (data.itemCount == 0) {
-//                EmptySearchResultsContent(
-//                    query = query,
-//                    modifier = modifier
-//                )
-            }
+@Composable
+private fun LoadingContent(
+    modifier: Modifier = Modifier,
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = 8.dp),
+        modifier = modifier
+    ) {
+        items(5) {
+            SearchUserItemShimmer()
         }
     }
 }
