@@ -31,11 +31,11 @@ class SearchRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                MockSearchPagingSource(scenario = Scenario.NO_DATA)
-//                SearchPagingSource(
-//                    searchApi = searchApi,
-//                    query = query
-//                )
+//                MockSearchPagingSource(scenario = Scenario.SUCCESS)
+                SearchPagingSource(
+                    searchApi = searchApi,
+                    query = query
+                )
             }
         )
             .flow

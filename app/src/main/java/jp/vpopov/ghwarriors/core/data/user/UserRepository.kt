@@ -5,6 +5,7 @@ import jp.vpopov.ghwarriors.core.domain.model.UserProfileInfo
 import jp.vpopov.ghwarriors.core.extension.throwOnCancellation
 import jp.vpopov.ghwarriors.core.logging.Logging
 import kotlinx.coroutines.delay
+import okio.IOException
 import javax.inject.Inject
 
 interface UserRepository {
@@ -14,6 +15,10 @@ interface UserRepository {
 class MockUserRepository @Inject constructor() : UserRepository {
     override suspend fun fetchProfile(userId: Int): Result<UserProfileInfo> {
         delay(2000)
+//        return Result.failure(IOException("Failed to fetch user profile"))
+
+//        return Result.failure(Exception("Failed to fetch user profile"))
+
         return Result.success(
             UserProfileInfo(
                 userId = userId,

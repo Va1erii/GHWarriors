@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import jp.vpopov.ghwarriors.core.data.user.MockUserRepository
 import jp.vpopov.ghwarriors.core.data.user.UserApi
 import jp.vpopov.ghwarriors.core.data.user.UserRepository
 import jp.vpopov.ghwarriors.core.data.user.UserRepositoryImpl

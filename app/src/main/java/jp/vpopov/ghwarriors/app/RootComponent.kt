@@ -21,6 +21,7 @@ interface RootComponent : DeeplinkHandler {
     interface Factory {
         fun create(
             componentContext: ComponentContext,
+            openExternalUrl: (String) -> Unit,
             deeplinkUrl: String? = null
         ): RootComponent
     }
@@ -37,11 +38,13 @@ class DefaultRootComponentFactory @Inject constructor(
 ) : RootComponent.Factory {
     override fun create(
         componentContext: ComponentContext,
-        deeplinkUrl: String?
+        openExternalUrl: (String) -> Unit,
+        deeplinkUrl: String?,
     ): RootComponent {
         return DefaultRootComponent(
             componentContext = componentContext,
             deeplinkUrl = deeplinkUrl,
+            openExternalUrl = openExternalUrl,
             tabsComponentFactory = tabsComponentFactory,
             profileComponentFactory = profileComponentFactory
         )
@@ -51,6 +54,7 @@ class DefaultRootComponentFactory @Inject constructor(
 class DefaultRootComponent(
     componentContext: ComponentContext,
     private val deeplinkUrl: String?,
+    private val openExternalUrl: (String) -> Unit,
     private val tabsComponentFactory: TabsComponent.Factory,
     private val profileComponentFactory: ProfileComponent.Factory
 ) : RootComponent, ComponentContext by componentContext {
@@ -94,7 +98,7 @@ class DefaultRootComponent(
         val component = profileComponentFactory.create(
             componentContext = componentContext,
             userId = config.userId,
-            onRepositorySelected = {},
+            onRepositorySelected = { openExternalUrl(it.url) },
             onBackPressed = {
                 navigation.pop()
             }

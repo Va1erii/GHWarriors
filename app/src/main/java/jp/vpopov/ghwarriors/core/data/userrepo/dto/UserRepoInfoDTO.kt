@@ -10,7 +10,7 @@ data class UserRepoInfoDTO(
     val name: String,
     @SerialName("full_name") val fullName: String,
     val description: String?,
-    val url: String,
+    @SerialName("html_url") val url: String,
     val language: String?,
     val fork: Boolean,
     @SerialName("stargazers_count") val starsCount: Int,
