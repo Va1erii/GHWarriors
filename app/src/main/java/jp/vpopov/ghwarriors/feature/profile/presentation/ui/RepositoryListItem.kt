@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,8 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,9 +43,14 @@ fun RepositoryListItem(
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val starsText = remember(repository.starsCount) {
+        repository.starsCount.toString()
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 80.dp)
             .padding(horizontal = 16.dp, vertical = 4.dp),
         onClick = onItemClick,
         colors = CardDefaults.cardColors(
@@ -72,29 +76,12 @@ fun RepositoryListItem(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Yellow400
-                    )
-                    val starsCount by remember(repository.starsCount) {
-                        mutableStateOf(repository.starsCount.toString())
-                    }
-                    Text(
-                        text = starsCount,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                StarsSection(
+                    starsText = starsText,
+                    modifier = Modifier
+                )
             }
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -113,26 +100,65 @@ fun RepositoryListItem(
             }
             repository.language?.let { language ->
                 Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Box(
+                Row {
+                    Spacer(Modifier.weight(1f))
+                    LanguageSection(
+                        language = language,
                         modifier = Modifier
-                            .size(12.dp)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(MaterialTheme.colorScheme.primary)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = language,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StarsSection(
+    starsText: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Star,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = Yellow400
+        )
+        Text(
+            text = starsText,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun LanguageSection(
+    language: String,
+    modifier: Modifier = Modifier
+) {
+    val languageIndicatorShape = remember { RoundedCornerShape(6.dp) }
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
+    ) {
+        Box(
+            modifier = Modifier
+                .size(12.dp)
+                .clip(languageIndicatorShape)
+                .background(MaterialTheme.colorScheme.primary)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = language,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
