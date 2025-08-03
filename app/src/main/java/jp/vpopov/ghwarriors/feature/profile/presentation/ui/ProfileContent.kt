@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -20,7 +21,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,40 +37,83 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import jp.vpopov.ghwarriors.R
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.domain.model.UserProfileInfo
 import jp.vpopov.ghwarriors.core.domain.model.UserRepoInfo
 import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
+import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileState
+import jp.vpopov.ghwarriors.feature.shared.presentation.ui.ErrorContent
 
 @Composable
 fun ProfileContent(
     component: ProfileComponent,
     modifier: Modifier = Modifier
 ) {
-    val state by component.model.collectAsState()
-    val userProfileInfo = state.userProfileInfo
-    if (userProfileInfo != null) {
-        ProfileContent(
-            profile = userProfileInfo,
-            data = state.repositories,
+    val model by component.model.collectAsState()
+    val repositories = component.repositories.collectAsLazyPagingItems()
+    when (val state = model) {
+        is ProfileState.Loading -> {}
+        is ProfileState.Error -> ErrorContent(state.error, modifier)
+        is ProfileState.Success -> ProfileContent(
+            state = state,
+            repositories = repositories,
             onBookmarkToggle = component::onUserBookmarkToggle,
+            onRepositorySelected = component::onRepositorySelected,
             modifier = modifier.fillMaxSize()
         )
     }
 }
 
 @Composable
-fun ProfileContent(
+private fun ProfileContent(
+    state: ProfileState.Success,
+    repositories: LazyPagingItems<UserRepoInfo>,
+    onBookmarkToggle: () -> Unit,
+    onRepositorySelected: (UserRepoInfo) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item(key = state.userProfileInfo.userName) {
+            ProfileHeaderContent(
+                profile = state.userProfileInfo,
+                onBookmarkToggle = onBookmarkToggle,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(24.dp))
+        }
+        items(
+            count = repositories.itemCount,
+            key = repositories.itemKey { it.id }
+        ) { index ->
+            val repository = repositories[index]
+            val repositoryClick by rememberUpdatedState(onRepositorySelected)
+            if (repository != null) {
+                RepositoryListItem(
+                    repository = repository,
+                    onItemClick = { repositoryClick(repository) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileHeaderContent(
     profile: UserProfileInfo,
-    data: List<UserRepoInfo>,
     onBookmarkToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
             .padding(start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -77,7 +124,7 @@ fun ProfileContent(
             modifier = Modifier
                 .size(150.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.tertiary)
+                .background(MaterialTheme.colorScheme.secondary)
                 .padding(1.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop,
@@ -94,14 +141,19 @@ fun ProfileContent(
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(4.dp))
+        val userName by remember(profile.userName) {
+            derivedStateOf {
+                "@${profile.userName}"
+            }
+        }
         Text(
-            text = "@${profile.userName}",
+            text = userName,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(24.dp))
         profile.bio?.let { bio ->
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = bio,
                 style = MaterialTheme.typography.bodyLarge,
@@ -109,8 +161,8 @@ fun ProfileContent(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(24.dp))
         }
+        Spacer(modifier = Modifier.height(24.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -132,11 +184,6 @@ fun ProfileContent(
                 modifier = Modifier.weight(1f)
             )
         }
-        RepositoryList(
-            data = data,
-            onItemClick = {},
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
 
@@ -190,7 +237,7 @@ private fun StatCard(
 private fun ProfileContentPreview() {
     GHWarriorsTheme {
         Scaffold { innerPadding ->
-            ProfileContent(
+            ProfileHeaderContent(
                 profile = UserProfileInfo(
                     userId = 1,
                     name = "John Doe",
@@ -200,18 +247,6 @@ private fun ProfileContentPreview() {
                     followersCount = 150,
                     followingCount = 75,
                     publicReposCount = 10
-                ),
-                data = listOf(
-                    UserRepoInfo(
-                        id = 1,
-                        name = "Sample Repository",
-                        fullName = "john_doe/sample-repo",
-                        description = "This is a sample repository.",
-                        url = "",
-                        language = "Kotlin",
-                        starsCount = 100,
-                        isFork = false,
-                    )
                 ),
                 onBookmarkToggle = {},
                 modifier = Modifier
