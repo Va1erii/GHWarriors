@@ -1,5 +1,6 @@
 package jp.vpopov.ghwarriors.feature.search.presentation.component
 
+import androidx.paging.LoadState
 import androidx.paging.LoadState.NotLoading
 import androidx.paging.LoadStates
 import androidx.paging.PagingData
@@ -7,9 +8,9 @@ import androidx.paging.cachedIn
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import jp.vpopov.ghwarriors.core.data.search.SearchRepository
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
-import jp.vpopov.ghwarriors.core.data.search.SearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,7 +54,18 @@ class SearchViewModel @AssistedInject constructor(
             }
 
             else -> {
-                _state.update { it.copy(query = query) }
+                _state.update {
+                    it.copy(
+                        query = query,
+                        users = PagingData.empty(
+                            sourceLoadStates = LoadStates(
+                                refresh = LoadState.Loading,
+                                prepend = NotLoading(false),
+                                append = NotLoading(false)
+                            )
+                        )
+                    )
+                }
                 viewModelScope.launch {
                     searchRepository.searchUsers(query)
                         .cachedIn(viewModelScope)
