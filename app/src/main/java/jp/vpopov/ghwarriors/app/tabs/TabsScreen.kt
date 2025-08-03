@@ -23,6 +23,7 @@ import jp.vpopov.ghwarriors.R
 import jp.vpopov.ghwarriors.core.designsystem.component.GHWNavigationBar
 import jp.vpopov.ghwarriors.core.designsystem.component.NavItem
 import jp.vpopov.ghwarriors.core.extension.Localization
+import jp.vpopov.ghwarriors.feature.bookmark.presentation.ui.BookmarkContent
 import jp.vpopov.ghwarriors.feature.search.presentation.ui.SearchContent
 import jp.vpopov.ghwarriors.util.PainterResource.DrawableResource
 import jp.vpopov.ghwarriors.util.PainterResource.VectorImage
@@ -65,12 +66,10 @@ fun TabsScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                is TabsComponent.Child.Bookmark -> Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Bookmark")
-                }
+                is TabsComponent.Child.Bookmark -> BookmarkContent(
+                    component = instance.component,
+                    modifier = Modifier.fillMaxSize()
+                )
 
                 is TabsComponent.Child.Settings -> Box(
                     modifier = Modifier.fillMaxSize(),

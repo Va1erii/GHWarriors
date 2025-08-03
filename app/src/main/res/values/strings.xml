@@ -23,4 +23,7 @@
     <string name="try_again">Try again</string>
     <string name="search_onboarding_title">Start typing to search</string>
     <string name="search_onboarding_message">Search for users by name or username</string>
+    <string name="bookmarks_empty_title">No Bookmarks Yet</string>
+    <string name="bookmarks_empty_message">Users you bookmark will appear here for quick access</string>
+    <string name="delete">Delete</string>
 </resources>
