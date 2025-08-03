@@ -18,5 +18,9 @@
     <string name="error_timeout_message">The request took too long. Please try again.</string>
     <string name="error_common_title">Something went wrong</string>
     <string name="error_common_message">An unexpected error occurred. Please try again.</string>
+    <string name="search_no_users_found_title">No Users Found</string>
+    <string name="search_no_users_found_message">No users found for %1$s. Try searching with different keywords.</string>
     <string name="try_again">Try again</string>
+    <string name="search_onboarding_title">Start typing to search</string>
+    <string name="search_onboarding_message">Search for users by name or username</string>
 </resources>

@@ -31,7 +31,7 @@ class SearchRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                MockSearchPagingSource(scenario = Scenario.NO_CONNECTION_ERROR)
+                MockSearchPagingSource(scenario = Scenario.NO_DATA)
 //                SearchPagingSource(
 //                    searchApi = searchApi,
 //                    query = query
