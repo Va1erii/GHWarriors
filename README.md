@@ -72,6 +72,19 @@ This pattern provides:
 - Easy testing and mocking
 - Separation of concerns between navigation and business logic
 
+## 🔐 GitHub Token Setup
+App uses a GitHub Personal Access Token (PAT) to avoid rate limiting.
+Set in `~/gradle.properties`:
+```ini
+access_token=YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
+```
+
+## 📌 Core Features
+- **Search**: GitHub users, paged, real-time
+- **Bookmarks**: Save/remove with Room, swipe to delete
+- **Profile**: User details, repo list (paged), deep links
+- **Settings**: App theme management
+
 ## Technology Stack
 - **Kotlin**: 2.2.0
 - **Compose**: 2025.07.00 BOM
