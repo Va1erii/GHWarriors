@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -39,13 +38,15 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import jp.vpopov.ghwarriors.R
-import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.core.error.ErrorMapper
 import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent
+import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent.UserWithBookmarkInfo
 import jp.vpopov.ghwarriors.feature.shared.presentation.ui.ErrorContent
 import jp.vpopov.ghwarriors.feature.shared.presentation.ui.LoadMoreError
 import jp.vpopov.ghwarriors.feature.shared.presentation.ui.LoadingMore
+import jp.vpopov.ghwarriors.feature.shared.presentation.ui.UserItem
+import jp.vpopov.ghwarriors.feature.shared.presentation.ui.UserItemShimmer
 import kotlinx.coroutines.delay
 
 
@@ -91,6 +92,7 @@ fun SearchContent(
             query = query,
             data = users,
             onUserClick = { user -> component.onUserSelected(user) },
+            onBookmarkClick = { user -> component.onBookmarkClick(user) },
             modifier = Modifier.weight(1f)
         )
     }
@@ -100,8 +102,9 @@ fun SearchContent(
 @Composable
 private fun SearchContentSection(
     query: String,
-    data: LazyPagingItems<UserInfo>,
-    onUserClick: (UserInfo) -> Unit,
+    data: LazyPagingItems<UserWithBookmarkInfo>,
+    onUserClick: (UserWithBookmarkInfo) -> Unit,
+    onBookmarkClick: (UserWithBookmarkInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isLoading = data.loadState.refresh is LoadState.Loading
@@ -134,6 +137,7 @@ private fun SearchContentSection(
         else -> PagingSearchResultsList(
             data = data,
             onUserClick = onUserClick,
+            onBookmarkClick = onBookmarkClick,
             modifier = modifier
         )
     }
@@ -183,8 +187,9 @@ private fun EmptyQueryContent(
 
 @Composable
 private fun PagingSearchResultsList(
-    data: LazyPagingItems<UserInfo>,
-    onUserClick: (UserInfo) -> Unit,
+    data: LazyPagingItems<UserWithBookmarkInfo>,
+    onUserClick: (UserWithBookmarkInfo) -> Unit,
+    onBookmarkClick: (UserWithBookmarkInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -193,16 +198,17 @@ private fun PagingSearchResultsList(
     ) {
         items(
             count = data.itemCount,
-            key = { index -> data[index]?.id ?: index }
+            key = { index -> data[index]?.user?.id ?: index }
         ) { index ->
-            val user = data[index]
-            if (user != null) {
-                SearchUserItem(
-                    user = user,
-                    onClick = { onUserClick(user) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 56.dp)
+            val item = data[index]
+            if (item != null) {
+                UserItem(
+                    user = item.user,
+                    onClick = { onUserClick(item) },
+                    showBookmark = true,
+                    isBookmarked = item.isBookmarked,
+                    onBookmarkClick = { onBookmarkClick(item) },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -266,7 +272,7 @@ private fun LoadingContent(
         modifier = modifier
     ) {
         items(5) {
-            SearchUserItemShimmer()
+            UserItemShimmer()
         }
     }
 }

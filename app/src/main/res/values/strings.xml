@@ -26,4 +26,6 @@
     <string name="bookmarks_empty_title">No Bookmarks Yet</string>
     <string name="bookmarks_empty_message">Users you bookmark will appear here for quick access</string>
     <string name="delete">Delete</string>
+    <string name="bookmarks_add">Add bookmark</string>
+    <string name="bookmarks_remove">Remove bookmark</string>
 </resources>

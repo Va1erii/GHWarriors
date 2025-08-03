@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
+import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent.UserWithBookmarkInfo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.builtins.serializer
@@ -11,10 +12,11 @@ import javax.inject.Inject
 
 interface SearchComponent {
     val query: Flow<String>
-    val users: Flow<PagingData<UserInfo>>
+    val users: Flow<PagingData<UserWithBookmarkInfo>>
 
     fun search(query: String)
-    fun onUserSelected(user: UserInfo)
+    fun onUserSelected(user: UserWithBookmarkInfo)
+    fun onBookmarkClick(user: UserWithBookmarkInfo)
 
     interface Factory {
         fun create(
@@ -22,6 +24,11 @@ interface SearchComponent {
             userSelected: (UserInfo) -> Unit
         ): SearchComponent
     }
+
+    data class UserWithBookmarkInfo(
+        val user: UserInfo,
+        val isBookmarked: Boolean
+    )
 }
 
 class DefaultSearchComponentFactory @Inject constructor(
@@ -47,7 +54,7 @@ class DefaultSearchComponent(
     }
 
     override val query: Flow<String> = viewModel.state.map { it.query }
-    override val users: Flow<PagingData<UserInfo>> = viewModel.state.map { it.users }
+    override val users: Flow<PagingData<UserWithBookmarkInfo>> = viewModel.state.map { it.users }
 
     init {
         stateKeeper.register(QUERY_KEY, String.serializer()) { viewModel.state.value.query }
@@ -57,7 +64,11 @@ class DefaultSearchComponent(
         viewModel.search(query)
     }
 
-    override fun onUserSelected(user: UserInfo) = userSelected(user)
+    override fun onUserSelected(user: UserWithBookmarkInfo) = userSelected(user.user)
+
+    override fun onBookmarkClick(user: UserWithBookmarkInfo) {
+        viewModel.bookmarkUser(user)
+    }
 
     private companion object {
         const val QUERY_KEY = "search_query"
