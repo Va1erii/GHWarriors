@@ -3,6 +3,7 @@ package jp.vpopov.ghwarriors.feature.profile.presentation.ui
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -57,7 +59,7 @@ fun ProfileContent(
     val model by component.model.collectAsState()
     val repositories = component.repositories.collectAsLazyPagingItems()
     when (val state = model) {
-        is ProfileState.Loading -> {}
+        is ProfileState.Loading -> LoadingContent(modifier)
         is ProfileState.Error -> ErrorContent(state.error, modifier)
         is ProfileState.Success -> ProfileContent(
             state = state,
@@ -66,6 +68,18 @@ fun ProfileContent(
             onRepositorySelected = component::onRepositorySelected,
             modifier = modifier.fillMaxSize()
         )
+    }
+}
+
+@Composable
+private fun LoadingContent(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
     }
 }
 

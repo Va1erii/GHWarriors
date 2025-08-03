@@ -49,10 +49,10 @@ class ProfileViewModel @AssistedInject constructor(
         .cachedIn(viewModelScope)
 
     init {
-        refresh()
+        refreshProfile()
     }
 
-    fun refresh() {
+    private fun refreshProfile() {
         viewModelScope.launch {
             userRepository.fetchProfile(userId)
                 .onSuccess { userProfileInfo ->
@@ -73,6 +73,10 @@ class ProfileViewModel @AssistedInject constructor(
                     }
                 }
         }
+    }
+
+    fun refresh() {
+        refreshProfile()
         userRepoInfoRepository.refreshRepositories()
     }
 
