@@ -4,9 +4,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.value.MutableValue
 import com.arkivanov.decompose.value.Value
 import jakarta.inject.Inject
-import jp.vpopov.ghwarriors.app.RootPageComponent
 
-interface SettingsRootComponent : RootPageComponent {
+interface SettingsRootComponent {
     interface Factory {
         fun create(
             componentContext: ComponentContext,
@@ -26,5 +25,4 @@ class DefaultSettingsRootComponentFactory @Inject constructor() : SettingsRootCo
 class DefaultSettingsRootComponent(
     componentContext: ComponentContext
 ) : SettingsRootComponent, ComponentContext by componentContext {
-    override val showNavBar: Value<Boolean> = MutableValue(true)
 }

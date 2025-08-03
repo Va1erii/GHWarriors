@@ -3,21 +3,20 @@ package jp.vpopov.ghwarriors.app
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.bringToFront
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.pushNew
+import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
 import jakarta.inject.Inject
-import jp.vpopov.ghwarriors.app.bookmark.BookmarkRootComponent
-import jp.vpopov.ghwarriors.app.search.SearchRootComponent
-import jp.vpopov.ghwarriors.app.settings.SettingsRootComponent
+import jp.vpopov.ghwarriors.app.tabs.TabsComponent
 import jp.vpopov.ghwarriors.core.deeplink.DeeplinkHandler
 import jp.vpopov.ghwarriors.core.deeplink.DeeplinkValidator
+import jp.vpopov.ghwarriors.feature.profile.presentation.component.ProfileComponent
 import kotlinx.serialization.Serializable
 
 interface RootComponent : DeeplinkHandler {
     val stack: Value<ChildStack<*, Child>>
-
-    fun selectTab(tab: Tab)
 
     interface Factory {
         fun create(
@@ -27,33 +26,14 @@ interface RootComponent : DeeplinkHandler {
     }
 
     sealed class Child {
-        abstract val tab: Tab
-        abstract val component: RootPageComponent
-
-        class Search(override val component: SearchRootComponent) : Child() {
-            override val tab: Tab = Tab.Search
-        }
-
-        class Bookmark(override val component: BookmarkRootComponent) : Child() {
-            override val tab: Tab = Tab.Bookmarks
-        }
-
-        class Settings(override val component: SettingsRootComponent) : Child() {
-            override val tab: Tab = Tab.Settings
-        }
-    }
-
-    enum class Tab(val index: Int) {
-        Search(0),
-        Bookmarks(1),
-        Settings(2)
+        class Tabs(val component: TabsComponent) : Child()
+        class Profile(val component: ProfileComponent) : Child()
     }
 }
 
 class DefaultRootComponentFactory @Inject constructor(
-    private val searchRootComponentFactory: SearchRootComponent.Factory,
-    private val bookmarkRootComponentFactory: BookmarkRootComponent.Factory,
-    private val settingsRootComponentFactory: SettingsRootComponent.Factory
+    private val tabsComponentFactory: TabsComponent.Factory,
+    private val profileComponentFactory: ProfileComponent.Factory
 ) : RootComponent.Factory {
     override fun create(
         componentContext: ComponentContext,
@@ -62,9 +42,8 @@ class DefaultRootComponentFactory @Inject constructor(
         return DefaultRootComponent(
             componentContext = componentContext,
             deeplinkUrl = deeplinkUrl,
-            searchRootComponentFactory = searchRootComponentFactory,
-            bookmarkRootComponentFactory = bookmarkRootComponentFactory,
-            settingsRootComponentFactory = settingsRootComponentFactory
+            tabsComponentFactory = tabsComponentFactory,
+            profileComponentFactory = profileComponentFactory
         )
     }
 }
@@ -72,9 +51,8 @@ class DefaultRootComponentFactory @Inject constructor(
 class DefaultRootComponent(
     componentContext: ComponentContext,
     private val deeplinkUrl: String?,
-    private val searchRootComponentFactory: SearchRootComponent.Factory,
-    private val bookmarkRootComponentFactory: BookmarkRootComponent.Factory,
-    private val settingsRootComponentFactory: SettingsRootComponent.Factory
+    private val tabsComponentFactory: TabsComponent.Factory,
+    private val profileComponentFactory: ProfileComponent.Factory
 ) : RootComponent, ComponentContext by componentContext {
     private val navigation = StackNavigation<Config>()
 
@@ -82,8 +60,8 @@ class DefaultRootComponent(
         childStack(
             source = navigation,
             serializer = Config.serializer(),
-            initialStack = { listOf(getInitialConfig(deeplinkUrl)) },
-            handleBackButton = false,
+            initialStack = { getInitialConfig(deeplinkUrl) },
+            handleBackButton = true,
             childFactory = ::createChild
         )
 
@@ -92,61 +70,55 @@ class DefaultRootComponent(
         componentContext: ComponentContext
     ): RootComponent.Child {
         return when (config) {
-            is Config.Search -> createSearchChild(config, componentContext)
-            Config.Bookmarks -> createBookmarkChild(componentContext)
-            Config.Settings -> createSettingsChild(componentContext)
+            Config.Tabs -> createTabsChild(componentContext)
+            is Config.Profile -> createProfileChild(config, componentContext)
         }
     }
 
-    private fun createSearchChild(
-        config: Config.Search,
+    private fun createTabsChild(
         componentContext: ComponentContext
-    ): RootComponent.Child.Search {
-        val component = searchRootComponentFactory.create(
+    ): RootComponent.Child.Tabs {
+        val component = tabsComponentFactory.create(
             componentContext = componentContext,
-            userId = config.userId
+            onUserSelected = { user ->
+                navigation.pushNew(Config.Profile(userId = user.id))
+            }
         )
-        return RootComponent.Child.Search(component)
+        return RootComponent.Child.Tabs(component)
     }
 
-    private fun createBookmarkChild(
+    private fun createProfileChild(
+        config: Config.Profile,
         componentContext: ComponentContext
-    ): RootComponent.Child.Bookmark {
-        val component = bookmarkRootComponentFactory.create(componentContext)
-        return RootComponent.Child.Bookmark(component)
+    ): RootComponent.Child.Profile {
+        val component = profileComponentFactory.create(
+            componentContext = componentContext,
+            userId = config.userId,
+            onRepositorySelected = {},
+            onBackPressed = {
+                navigation.pop()
+            }
+        )
+        return RootComponent.Child.Profile(component)
     }
 
-    private fun createSettingsChild(
-        componentContext: ComponentContext
-    ): RootComponent.Child.Settings {
-        val component = settingsRootComponentFactory.create(componentContext)
-        return RootComponent.Child.Settings(component)
-    }
-
-    private fun getInitialConfig(deeplinkUrl: String?): Config {
-        return deeplinkUrl?.let { createConfigFromDeeplink(it) }
-            ?: Config.Search()
-    }
-
-    override fun selectTab(tab: RootComponent.Tab) {
-        val config = when (tab) {
-            RootComponent.Tab.Search -> Config.Search()
-            RootComponent.Tab.Bookmarks -> Config.Bookmarks
-            RootComponent.Tab.Settings -> Config.Settings
-        }
-        navigation.bringToFront(config)
+    private fun getInitialConfig(deeplinkUrl: String?): List<Config> {
+        val profileConfig = deeplinkUrl?.let { createConfigFromDeeplink(it) }
+        return listOfNotNull(Config.Tabs, profileConfig)
     }
 
     override fun handleDeeplink(deeplinkUrl: String) {
-        val config = createConfigFromDeeplink(deeplinkUrl)
-        config?.let { navigation.bringToFront(it) }
+        val profileConfig = createConfigFromDeeplink(deeplinkUrl)
+        if (profileConfig != null) {
+            navigation.replaceAll(Config.Tabs, profileConfig)
+        }
     }
 
     private fun createConfigFromDeeplink(deeplinkUrl: String): Config? {
         val isValid = DeeplinkValidator.isValidDeeplink(deeplinkUrl)
         return if (isValid) {
             val userId = deeplinkUrl.substringAfterLast("/").toIntOrNull()
-            Config.Search(userId)
+            userId?.let { Config.Profile(it) }
         } else {
             null
         }
@@ -155,12 +127,9 @@ class DefaultRootComponent(
     @Serializable
     sealed class Config {
         @Serializable
-        data class Search(val userId: Int? = null) : Config()
+        data object Tabs : Config()
 
         @Serializable
-        data object Bookmarks : Config()
-
-        @Serializable
-        data object Settings : Config()
+        data class Profile(val userId: Int) : Config()
     }
 }

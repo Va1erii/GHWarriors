@@ -9,15 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -69,8 +68,6 @@ fun ProfileContent(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
-            .navigationBarsPadding()
-            .statusBarsPadding()
             .padding(start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -192,31 +189,35 @@ private fun StatCard(
 @Composable
 private fun ProfileContentPreview() {
     GHWarriorsTheme {
-        ProfileContent(
-            profile = UserProfileInfo(
-                userId = 1,
-                name = "John Doe",
-                userName = "john_doe",
-                avatarUrl = "https://example.com/avatar.jpg",
-                bio = "This is a sample bio for John Doe.",
-                followersCount = 150,
-                followingCount = 75,
-                publicReposCount = 10
-            ),
-            data = listOf(
-                UserRepoInfo(
-                    id = 1,
-                    name = "Sample Repository",
-                    fullName = "john_doe/sample-repo",
-                    description = "This is a sample repository.",
-                    url = "",
-                    language = "Kotlin",
-                    starsCount = 100,
-                    isFork = false,
-                )
-            ),
-            onBookmarkToggle = {},
-            modifier = Modifier.fillMaxWidth()
-        )
+        Scaffold { innerPadding ->
+            ProfileContent(
+                profile = UserProfileInfo(
+                    userId = 1,
+                    name = "John Doe",
+                    userName = "john_doe",
+                    avatarUrl = "https://example.com/avatar.jpg",
+                    bio = "This is a sample bio for John Doe.",
+                    followersCount = 150,
+                    followingCount = 75,
+                    publicReposCount = 10
+                ),
+                data = listOf(
+                    UserRepoInfo(
+                        id = 1,
+                        name = "Sample Repository",
+                        fullName = "john_doe/sample-repo",
+                        description = "This is a sample repository.",
+                        url = "",
+                        language = "Kotlin",
+                        starsCount = 100,
+                        isFork = false,
+                    )
+                ),
+                onBookmarkToggle = {},
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxWidth()
+            )
+        }
     }
 }

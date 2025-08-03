@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import jp.vpopov.ghwarriors.R
-import jp.vpopov.ghwarriors.app.RootComponent.Tab
+import jp.vpopov.ghwarriors.app.tabs.TabsComponent.Tab
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.util.PainterResource
