@@ -2,6 +2,7 @@ package jp.vpopov.ghwarriors
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import jp.vpopov.ghwarriors.core.logging.Logging
 import jp.vpopov.ghwarriors.core.logging.LoggingManager
 import javax.inject.Inject
 
@@ -12,6 +13,6 @@ class GHWarriorsApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        loggingManager.setup()
+        Logging.delegate = loggingManager.apply { setup() }
     }
 }

@@ -1,4 +1,4 @@
-package jp.vpopov.ghwarriors.core.di
+package jp.vpopov.ghwarriors.core.network.di
 
 import dagger.Module
 import dagger.Provides

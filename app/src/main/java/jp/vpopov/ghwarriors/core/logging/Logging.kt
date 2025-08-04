@@ -1,39 +1,24 @@
 package jp.vpopov.ghwarriors.core.logging
 
-object Logging {
-    private lateinit var logger: Logger
+/**
+ * Global logging facade that delegates to a configurable LoggingManager implementation.
+ * This allows for easy switching between different logging implementations (e.g., Timber, console, no-op).
+ *
+ * By default, uses NoOpLoggingManager which discards all log messages.
+ * The delegate should be set during application initialization.
+ */
+object Logging : LoggingManager {
+    /**
+     * The actual LoggingManager implementation that handles logging operations.
+     * Defaults to NoOpLoggingManager which discards all logs.
+     */
+    var delegate: LoggingManager = NoOpLoggingManager
 
-    fun d(
-        throwable: Throwable? = null,
-        message: () -> String
-    ) = logger.d(throwable, message)
+    override fun setup() {
+        delegate.setup()
+    }
 
-    fun i(
-        throwable: Throwable? = null,
-        message: () -> String
-    ) = logger.i(throwable, message)
-
-    fun w(
-        throwable: Throwable? = null,
-        message: () -> String
-    ) = logger.w(throwable, message)
-
-    fun e(
-        throwable: Throwable? = null,
-        message: () -> String
-    ) = logger.e(throwable, message)
-
-    fun v(
-        throwable: Throwable? = null,
-        message: () -> String
-    ) = logger.v(throwable, message)
-
-    fun wtf(
-        throwable: Throwable? = null,
-        message: () -> String
-    ) = logger.wtf(throwable, message)
-
-    fun setup(newLogger: Logger) {
-        logger = newLogger
+    override fun withTag(tag: String): Logger {
+        return delegate.withTag(tag)
     }
 }

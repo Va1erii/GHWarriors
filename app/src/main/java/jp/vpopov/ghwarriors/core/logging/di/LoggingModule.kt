@@ -1,11 +1,11 @@
-package jp.vpopov.ghwarriors.core.di
+package jp.vpopov.ghwarriors.core.logging.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.vpopov.ghwarriors.core.logging.LoggingManager
-import jp.vpopov.ghwarriors.core.logging.TimberLoggingManager
+import jp.vpopov.ghwarriors.core.logging.timber.TimberLoggingManager
 import javax.inject.Singleton
 
 @Module

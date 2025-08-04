@@ -1,50 +1,32 @@
 package jp.vpopov.ghwarriors.core.logging
 
-import android.util.Log
-import jp.vpopov.ghwarriors.BuildConfig
-import timber.log.Timber
-import javax.inject.Inject
+import kotlin.reflect.KClass
 
+/**
+ * Interface for managing logging system initialization and logger creation.
+ * Implementations handle the setup of logging infrastructure and provide tagged loggers.
+ */
 interface LoggingManager {
+    /**
+     * Initializes the logging system.
+     * This should be called once during application startup.
+     */
     fun setup()
+
+    /**
+     * Creates a logger with the specified tag.
+     *
+     * @param tag The tag to associate with log messages from this logger
+     * @return A Logger instance configured with the specified tag
+     */
+    fun withTag(tag: String): Logger
 }
 
-class TimberLoggingManager @Inject constructor() : LoggingManager {
-    val logger = object : Logger {
-        override fun log(
-            priority: Int,
-            throwable: Throwable?,
-            message: () -> String
-        ) {
-            Timber.log(priority = priority, message = message(), t = throwable)
-        }
-    }
-
-    override fun setup() {
-        Timber.plant(
-            if (BuildConfig.DEBUG) {
-                Timber.DebugTree()
-            } else {
-                ReleaseTree()
-            }
-        )
-        Logging.setup(logger)
-    }
-
-    class ReleaseTree : Timber.Tree() {
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
-                return
-            }
-            if (Log.isLoggable(tag, priority)) {
-                var stackTrace = Log.getStackTraceString(t)
-                var message = if (stackTrace.isNotBlank()) {
-                    "$message\n$stackTrace"
-                } else {
-                    message
-                }
-                Log.println(priority, tag, message)
-            }
-        }
-    }
-}
+/**
+ * Creates a logger with a tag derived from the class name.
+ * This is a convenience extension that uses the simple class name as the tag.
+ *
+ * @param clazz The class to use for generating the tag
+ * @return A Logger instance configured with the class name as tag
+ */
+fun LoggingManager.withTag(clazz: KClass<*>): Logger = withTag(clazz.java.simpleName)
