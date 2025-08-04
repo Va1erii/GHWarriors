@@ -16,6 +16,7 @@ import jp.vpopov.ghwarriors.core.error.ErrorMapper
 import jp.vpopov.ghwarriors.core.logging.Logging
 import jp.vpopov.ghwarriors.core.logging.e
 import jp.vpopov.ghwarriors.core.logging.withTagLazy
+import jp.vpopov.ghwarriors.feature.profile.domain.GetNonForkedPublicRepositories
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,13 +45,13 @@ class ProfileViewModel @AssistedInject constructor(
     @Assisted private val userId: Int,
     private val userRepository: UserRepository,
     private val userRepoInfoRepository: UserRepoInfoRepository,
+    getNonForkedPublicRepositories: GetNonForkedPublicRepositories,
     dispatchers: AppDispatchers
 ) : DecomposeViewModel(dispatchers) {
     private val logger by Logging.withTagLazy(this::class)
     private val _state = MutableStateFlow<ProfileState>(ProfileState.Loading(userId))
     val state = _state.asStateFlow()
-    val repositories: Flow<PagingData<UserRepoInfo>> = userRepoInfoRepository
-        .fetchRepositories(userId)
+    val repositories: Flow<PagingData<UserRepoInfo>> = getNonForkedPublicRepositories(userId)
         .cachedIn(viewModelScope)
 
     init {
