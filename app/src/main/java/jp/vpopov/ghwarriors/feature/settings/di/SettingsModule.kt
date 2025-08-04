@@ -9,10 +9,8 @@ import jp.vpopov.ghwarriors.feature.settings.presentation.component.SettingsComp
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
-abstract class SettingsModule {
+interface SettingsModule {
 
     @Binds
-    abstract fun bindSettingsComponentFactory(
-        factory: DefaultSettingsComponentFactory
-    ): SettingsComponent.Factory
+    fun bindSettingsComponentFactory(factory: DefaultSettingsComponentFactory): SettingsComponent.Factory
 }

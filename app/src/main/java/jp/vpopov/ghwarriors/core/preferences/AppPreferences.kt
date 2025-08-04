@@ -19,8 +19,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
+/**
+ * Interface for managing application preferences.
+ * Provides reactive access to user settings and configuration options.
+ */
 interface AppPreferences {
+    /**
+     * Observes the current theme configuration.
+     *
+     * @return A Flow that emits the current ThemeConfig whenever it changes
+     */
     fun observeTheme(): Flow<ThemeConfig>
+
+    /**
+     * Updates the theme configuration.
+     *
+     * @param theme The new theme configuration to apply
+     */
     suspend fun setTheme(theme: ThemeConfig)
 }
 
