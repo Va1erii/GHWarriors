@@ -20,6 +20,8 @@ decomposeVersion = "3.3.0"
 roomVersion = "2.7.2"
 datastoreVersion = "1.1.7"
 androidxBrowserVersion = "1.8.0"
+coroutinesVersion = "1.10.2"
+mockkVersion = "1.14.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,6 +57,8 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastoreVersion" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowserVersion" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesVersion" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
