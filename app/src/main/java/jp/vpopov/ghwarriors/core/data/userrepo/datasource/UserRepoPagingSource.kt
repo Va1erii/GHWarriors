@@ -5,6 +5,8 @@ import androidx.paging.PagingState
 import jp.vpopov.ghwarriors.core.data.userrepo.UserRepoApi
 import jp.vpopov.ghwarriors.core.data.userrepo.dto.UserRepoInfoDTO
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.e
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import kotlinx.coroutines.CancellationException
 
 class UserRepoPagingSource(
@@ -15,6 +17,8 @@ class UserRepoPagingSource(
         private const val STARTING_PAGE = 1
         const val PER_PAGE = 30
     }
+
+    private val logger by Logging.withTagLazy(this::class)
 
     override fun getRefreshKey(state: PagingState<Int, UserRepoInfoDTO>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -41,7 +45,7 @@ class UserRepoPagingSource(
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            Logging.e(exception) { "Error loading data" }
+            logger.e(exception) { "Error loading data" }
             LoadResult.Error(exception)
         }
     }

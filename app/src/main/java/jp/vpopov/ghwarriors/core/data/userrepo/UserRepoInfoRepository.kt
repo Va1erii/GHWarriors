@@ -5,13 +5,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.map
-import jp.vpopov.ghwarriors.core.data.userrepo.datasource.MockUserRepoPagingSource
 import jp.vpopov.ghwarriors.core.data.userrepo.datasource.UserRepoPagingSource
-import jp.vpopov.ghwarriors.core.data.userrepo.datasource.UserRepoScenario
 import jp.vpopov.ghwarriors.core.data.userrepo.dto.UserRepoInfoDTO
 import jp.vpopov.ghwarriors.core.data.userrepo.dto.asDomainModel
 import jp.vpopov.ghwarriors.core.domain.model.UserRepoInfo
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.d
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -25,10 +25,11 @@ interface UserRepoInfoRepository {
 class UserRepoInfoRepositoryImpl @Inject constructor(
     private val userRepoApi: UserRepoApi
 ) : UserRepoInfoRepository {
+    private val logger by Logging.withTagLazy(this::class)
     private var repoPagingSource: PagingSource<Int, UserRepoInfoDTO>? = null
 
     override fun fetchRepositories(userId: Int): Flow<PagingData<UserRepoInfo>> {
-        Logging.d { "Fetch user repositories, userId=($userId)" }
+        logger.d { "Fetch user repositories, userId=($userId)" }
         repoPagingSource?.invalidate()
         return Pager(
             config = PagingConfig(
@@ -36,9 +37,6 @@ class UserRepoInfoRepositoryImpl @Inject constructor(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-//                MockUserRepoPagingSource(
-//                    scenario = UserRepoScenario.LOAD_MORE_ERROR
-//                ).also { repoPagingSource = it }
                 UserRepoPagingSource(
                     userId = userId,
                     userRepoApi = userRepoApi
@@ -51,6 +49,7 @@ class UserRepoInfoRepositoryImpl @Inject constructor(
     }
 
     override fun refreshRepositories() {
+        logger.d { "Refresh user repositories" }
         repoPagingSource?.invalidate()
     }
 }

@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import jp.vpopov.ghwarriors.core.data.user.MockUserRepository
 import jp.vpopov.ghwarriors.core.data.user.UserApi
 import jp.vpopov.ghwarriors.core.data.user.UserRepository
-import jp.vpopov.ghwarriors.core.data.user.UserRepositoryImpl
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -21,5 +20,5 @@ class UserDataModule {
 
     @Provides
     @Singleton
-    fun providesUserRepository(impl: UserRepositoryImpl): UserRepository = impl
+    fun providesUserRepository(impl: MockUserRepository): UserRepository = impl
 }

@@ -30,3 +30,10 @@ interface LoggingManager {
  * @return A Logger instance configured with the class name as tag
  */
 fun LoggingManager.withTag(clazz: KClass<*>): Logger = withTag(clazz.java.simpleName)
+
+/**
+ * Creates a lazy logger with a tag derived from the class name.
+ */
+fun LoggingManager.withTagLazy(clazz: KClass<*>): Lazy<Logger> = lazy {
+    withTag(clazz.java.simpleName)
+}

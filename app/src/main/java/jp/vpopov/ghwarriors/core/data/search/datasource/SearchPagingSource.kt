@@ -5,6 +5,8 @@ import androidx.paging.PagingState
 import jp.vpopov.ghwarriors.core.data.search.SearchApi
 import jp.vpopov.ghwarriors.core.data.search.dto.SearchUserDTO
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.e
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import kotlinx.coroutines.CancellationException
 
 class SearchPagingSource(
@@ -15,6 +17,8 @@ class SearchPagingSource(
         private const val STARTING_PAGE = 1
         const val PER_PAGE = 30
     }
+
+    private val logger by Logging.withTagLazy(this::class)
 
     override fun getRefreshKey(state: PagingState<Int, SearchUserDTO>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -42,7 +46,7 @@ class SearchPagingSource(
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {
-            Logging.e(exception) { "Error fetching data" }
+            logger.e(exception) { "Error fetching data" }
             LoadResult.Error(exception)
         }
     }
