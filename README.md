@@ -100,15 +100,6 @@ Set in `~/gradle.properties`:
 access_token=YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
 ```
 
-## 📦 Quick Installation (Release Build)
-For quick testing and installation, you can use the pre-built release APK from the `app/release/` directory:
-
-```bash
-adb install app/release/app-release.apk
-```
-
-**Note**: The release build includes a pre-configured access token for immediate testing. However, this token may expire due to security reasons as it has a shorter lifecycle. If you encounter API rate limiting or authentication errors, please set up your own GitHub Personal Access Token as described in the setup section above.
-
 ## 📌 Core Features
 - **Search**: GitHub users, paged, real-time
 - **Bookmarks**: Save/remove with Room, swipe to delete
