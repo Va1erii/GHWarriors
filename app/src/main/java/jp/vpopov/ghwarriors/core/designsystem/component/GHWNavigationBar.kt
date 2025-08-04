@@ -1,5 +1,6 @@
 package jp.vpopov.ghwarriors.core.designsystem.component
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +31,8 @@ import jp.vpopov.ghwarriors.app.tabs.TabsComponent.Tab
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.extension.Localization
 import jp.vpopov.ghwarriors.util.PainterResource
-import jp.vpopov.ghwarriors.util.PainterResource.VectorImage
 import jp.vpopov.ghwarriors.util.PainterResource.DrawableResource
+import jp.vpopov.ghwarriors.util.PainterResource.VectorImage
 import jp.vpopov.ghwarriors.util.painter
 
 @Immutable
@@ -82,6 +83,7 @@ fun <Tab> GHWNavigationBar(
 }
 
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun GHWNavigationBarPreview() {
     val items = listOf(
