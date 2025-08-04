@@ -4,8 +4,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.vpopov.ghwarriors.core.data.bookmark.BookmarkRepository
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
+import jp.vpopov.ghwarriors.core.dispatchers.AppDispatchers
 import jp.vpopov.ghwarriors.core.domain.model.UserInfo
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.e
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +22,10 @@ data class BookmarkState(
 )
 
 class BookmarkViewModel @AssistedInject constructor(
-    private val bookmarkRepository: BookmarkRepository
-) : DecomposeViewModel() {
+    private val bookmarkRepository: BookmarkRepository,
+    dispatchers: AppDispatchers
+) : DecomposeViewModel(dispatchers) {
+    private val logger by Logging.withTagLazy(this::class)
     private val _state = MutableStateFlow(BookmarkState())
     val state: StateFlow<BookmarkState> = _state.asStateFlow()
 
@@ -42,7 +47,7 @@ class BookmarkViewModel @AssistedInject constructor(
         viewModelScope.launch {
             bookmarkRepository.removeUserBookmark(user)
                 .onFailure { exception ->
-                    Logging.e(exception) { "Failed to remove bookmark for user: ${user.userName}" }
+                    logger.e(exception) { "Failed to remove bookmark for user: ${user.userName}" }
                 }
         }
     }

@@ -3,8 +3,11 @@ package jp.vpopov.ghwarriors.feature.settings.presentation.component
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
+import jp.vpopov.ghwarriors.core.dispatchers.AppDispatchers
 import jp.vpopov.ghwarriors.core.domain.model.ThemeConfig
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.e
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import jp.vpopov.ghwarriors.core.preferences.AppPreferences
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +21,10 @@ data class SettingsState(
 )
 
 class SettingsViewModel @AssistedInject constructor(
-    private val preferences: AppPreferences
-) : DecomposeViewModel() {
+    private val preferences: AppPreferences,
+    dispatchers: AppDispatchers
+) : DecomposeViewModel(dispatchers) {
+    private val logger by Logging.withTagLazy(this::class)
     val state: StateFlow<SettingsState> = preferences.observeTheme()
         .map { SettingsState(theme = it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, SettingsState())
@@ -29,7 +34,7 @@ class SettingsViewModel @AssistedInject constructor(
             runCatching {
                 preferences.setTheme(theme)
             }.onFailure { exception ->
-                Logging.e(exception) { "Failed to set theme preference: ${theme.name}" }
+                logger.e(exception) { "Failed to set theme preference: ${theme.name}" }
             }
         }
     }

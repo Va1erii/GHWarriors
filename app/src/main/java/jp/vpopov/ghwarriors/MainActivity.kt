@@ -25,6 +25,9 @@ import jp.vpopov.ghwarriors.app.RootScreen
 import jp.vpopov.ghwarriors.core.designsystem.theme.GHWarriorsTheme
 import jp.vpopov.ghwarriors.core.domain.model.ThemeConfig
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.d
+import jp.vpopov.ghwarriors.core.logging.e
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import jp.vpopov.ghwarriors.core.preferences.AppPreferences
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -40,7 +43,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var preferences: AppPreferences
+
     private var component: RootComponent? = null
+    private val logger by Logging.withTagLazy(this::class)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +98,7 @@ class MainActivity : ComponentActivity() {
 
     private fun openExternalUrl(url: String) {
         val uri = runCatching { url.toUri() }
-            .onFailure { Logging.e(it) { "Cannot parse URL: $url" } }
+            .onFailure { logger.e(it) { "Cannot parse URL: $url" } }
             .getOrNull()
             ?: return
         val isCustomTabSupported = CustomTabsClient.getPackageName(this, emptyList()) != null
@@ -105,6 +110,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openCustomTab(uri: Uri) {
+        logger.d { "Open custom tab: $uri" }
         val customTabsIntent = CustomTabsIntent.Builder()
             .setShareState(CustomTabsIntent.SHARE_STATE_ON)
             .build()
@@ -114,18 +120,19 @@ class MainActivity : ComponentActivity() {
         runCatching {
             startActivity(intent, customTabsIntent.startAnimationBundle)
         }.onFailure {
-            Logging.e(it) { "Couldn't open custom tab" }
+            logger.e(it) { "Couldn't open custom tab" }
         }
     }
 
     private fun openWithIntent(uri: Uri) {
+        logger.d { "Open with intent: $uri" }
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         runCatching {
             startActivity(intent)
         }.onFailure {
-            Logging.e(it) { "Couldn't open with intent" }
+            logger.e(it) { "Couldn't open with intent" }
         }
     }
 

@@ -8,11 +8,14 @@ import dagger.assisted.AssistedInject
 import jp.vpopov.ghwarriors.core.data.user.UserRepository
 import jp.vpopov.ghwarriors.core.data.userrepo.UserRepoInfoRepository
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
+import jp.vpopov.ghwarriors.core.dispatchers.AppDispatchers
 import jp.vpopov.ghwarriors.core.domain.model.UserProfileInfo
 import jp.vpopov.ghwarriors.core.domain.model.UserRepoInfo
 import jp.vpopov.ghwarriors.core.error.AppError
 import jp.vpopov.ghwarriors.core.error.ErrorMapper
 import jp.vpopov.ghwarriors.core.logging.Logging
+import jp.vpopov.ghwarriors.core.logging.e
+import jp.vpopov.ghwarriors.core.logging.withTagLazy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +44,9 @@ class ProfileViewModel @AssistedInject constructor(
     @Assisted private val userId: Int,
     private val userRepository: UserRepository,
     private val userRepoInfoRepository: UserRepoInfoRepository,
-) : DecomposeViewModel() {
+    dispatchers: AppDispatchers
+) : DecomposeViewModel(dispatchers) {
+    private val logger by Logging.withTagLazy(this::class)
     private val _state = MutableStateFlow<ProfileState>(ProfileState.Loading(userId))
     val state = _state.asStateFlow()
     val repositories: Flow<PagingData<UserRepoInfo>> = userRepoInfoRepository
@@ -65,7 +70,7 @@ class ProfileViewModel @AssistedInject constructor(
                     }
                 }
                 .onFailure { throwable ->
-                    Logging.e(throwable) { "Fetch user profile error" }
+                    logger.e(throwable) { "Fetch user profile error" }
                     _state.update {
                         ProfileState.Error(
                             userId = userId,

@@ -12,6 +12,7 @@ import dagger.assisted.AssistedInject
 import jp.vpopov.ghwarriors.core.data.bookmark.BookmarkRepository
 import jp.vpopov.ghwarriors.core.data.search.SearchRepository
 import jp.vpopov.ghwarriors.core.decompose.DecomposeViewModel
+import jp.vpopov.ghwarriors.core.dispatchers.AppDispatchers
 import jp.vpopov.ghwarriors.feature.search.presentation.component.SearchComponent.UserWithBookmarkInfo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,8 @@ class SearchViewModel @AssistedInject constructor(
     @Assisted private val query: String?,
     private val searchRepository: SearchRepository,
     private val bookmarkRepository: BookmarkRepository,
-) : DecomposeViewModel() {
+    dispatchers: AppDispatchers
+) : DecomposeViewModel(dispatchers) {
     private val bookmarkedUserIds = MutableStateFlow(emptySet<Int>())
     private val _state = MutableStateFlow(SearchState(query = query ?: ""))
     private var searchJob: Job? = null
