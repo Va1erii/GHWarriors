@@ -59,6 +59,7 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowserVersion" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesVersion" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
+androidx-paging-testing = { group = "androidx.paging", name = "paging-testing", version.ref = "pagingVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface SearchRepository {
-    suspend fun searchUsers(
+    fun searchUsers(
         query: String,
     ): Flow<PagingData<UserInfo>>
 }
@@ -25,7 +25,7 @@ class SearchRepositoryImpl @Inject constructor(
 ) : SearchRepository {
     private val logger by Logging.withTagLazy(this::class)
 
-    override suspend fun searchUsers(query: String): Flow<PagingData<UserInfo>> {
+    override fun searchUsers(query: String): Flow<PagingData<UserInfo>> {
         logger.d { "Search users, query=($query)" }
         return Pager(
             config = PagingConfig(
