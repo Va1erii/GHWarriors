@@ -53,6 +53,27 @@ sealed class Config {
 - InstanceKeeper: Survives configuration changes
 - Deep Link: ProfileComponent(userId: Int) can be created directly via config
 
+### 🔗 DeepLink Integration
+The application includes a comprehensive deeplink system through the `DeeplinkHandler` interface, supporting both HTTPS web links and custom scheme URLs:
+
+**Supported Patterns:**
+- `https://ghwarriors.app/profile/{userId}` - Web links for profile pages
+- `ghwarriors://profile/{userId}` - Custom scheme for direct app navigation
+
+**Implementation Details:**
+- `DeeplinkHandler` interface in `core/deeplink/` with validation logic
+- `RootComponent` implements deeplink handling and navigation
+- AndroidManifest.xml configured with intent-filters for both schemes
+- MainActivity processes deeplinks on app launch and when receiving new intents
+
+**Testing Deeplinks:**
+Since the app doesn't have a deployed web server or Firebase Dynamic Links for Android OS verification, deeplinks can be tested using Android Studio Run Configurations:
+1. Edit Run Configuration → Launch Options → Launch: URL
+2. Set URL to test deeplink (e.g., `ghwarriors://profile/123`)
+3. Run the configuration to simulate real deeplink behavior
+
+This approach mirrors how deeplinks work in production environments where the OS verifies and launches the app via registered intent-filters.
+
 ### Decompose Component Pattern
 Each screen is represented by a Component interface with a default implementation:
 
