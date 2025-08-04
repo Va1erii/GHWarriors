@@ -2,6 +2,7 @@ package jp.vpopov.ghwarriors.core.data.userrepo.datasource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import jp.vpopov.ghwarriors.core.data.search.datasource.Scenario
 import jp.vpopov.ghwarriors.core.data.userrepo.dto.UserRepoInfoDTO
 import jp.vpopov.ghwarriors.core.dispatchers.AppDispatchers
 import jp.vpopov.ghwarriors.core.logging.Logging
@@ -12,14 +13,36 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okio.IOException
 
+/**
+ * Defines different mock scenarios for testing pagination behavior.
+ */
 enum class UserRepoScenario {
+    /** Returns empty results */
     NO_DATA,
+
+    /** Returns paginated mock user data */
     SUCCESS,
+
+    /** Throws IOException to simulate network issues */
     NO_CONNECTION_ERROR,
+
+    /** Throws generic Exception for server errors */
     SERVER_ERROR,
+
+    /** Succeeds for first 2 pages, then throws error */
     LOAD_MORE_ERROR,
 }
 
+/**
+ * Mock implementation of [PagingSource] for testing search functionality.
+ *
+ * Simulates different network scenarios and provides paginated mock user repo data
+ * without requiring actual network calls.
+ *
+ * @param scenario Controls the mock behavior (defaults to [Scenario.SUCCESS])
+ * @param networkDelay Simulates network latency in milliseconds (defaults to 2000ms)
+ * @param dispatchers Provides coroutine dispatchers for background operations
+ */
 class MockUserRepoPagingSource(
     private val scenario: UserRepoScenario = UserRepoScenario.SUCCESS,
     private val networkDelay: Long = 2000,
